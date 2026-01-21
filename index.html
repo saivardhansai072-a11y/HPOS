@@ -1,318 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>HPOS — Human Potential Operating System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ======================================================
-   HPOS CORE VISUAL KERNEL
-====================================================== */
-
-:root {
-  --bg-main: radial-gradient(circle at top, #020617, #0f172a);
-  --card-bg: rgba(255,255,255,0.06);
-  --border-soft: rgba(255,255,255,0.12);
-  --accent: #38bdf8;
-  --text-main: #e5e7eb;
-  --text-soft: #94a3b8;
+/* ================= CORE THEME ================= */
+:root{
+  --bg: radial-gradient(circle at top,#020617,#0f172a);
+  --panel: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.12);
+  --accent:#38bdf8;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
 }
-
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui,Segoe UI,sans-serif;
+  background:var(--bg);color:var(--text)
 }
-
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
-  background: var(--bg-main);
-  color: var(--text-main);
-  overflow-x: hidden;
+.screen{display:none;min-height:100vh;padding:60px 20px}
+.screen.active{display:block;animation:fade .7s ease}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1}}
+.panel{
+  max-width:960px;margin:auto;padding:40px;
+  background:var(--panel);border-radius:20px;
+  border:1px solid var(--border);
+  backdrop-filter:blur(18px)
 }
-
-/* ======================================================
-   SCREEN SYSTEM (OS-LIKE)
-====================================================== */
-
-.screen {
-  display: none;
-  min-height: 100vh;
-  padding: 60px 20px;
+button{
+  width:100%;padding:14px;margin-top:12px;
+  border-radius:10px;border:none;
+  background:linear-gradient(135deg,#38bdf8,#6366f1);
+  color:#020617;font-size:1rem;cursor:pointer
 }
-
-.screen.active {
-  display: block;
-  animation: fadeIn 0.8s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ======================================================
-   CARD / PANEL
-====================================================== */
-
-.panel {
-  max-width: 900px;
-  margin: auto;
-  background: var(--card-bg);
-  border-radius: 20px;
-  padding: 40px;
-  border: 1px solid var(--border-soft);
-  backdrop-filter: blur(18px);
-}
-
-/* ======================================================
-   TYPOGRAPHY
-====================================================== */
-
-h1 { font-size: 2.2rem; margin: 0 0 10px; }
-h2 { font-size: 1.6rem; margin: 0 0 20px; }
-p  { line-height: 1.7; color: var(--text-soft); }
-
-/* ======================================================
-   BUTTONS
-====================================================== */
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 10px;
-  border: none;
-  font-size: 1rem;
-  background: linear-gradient(135deg, #38bdf8, #6366f1);
-  color: #020617;
-  cursor: pointer;
-}
-
-button:hover {
-  transform: translateY(-1px);
-}
-
-/* ======================================================
-   AI VOICE
-====================================================== */
-
-.ai-voice {
-  margin-top: 24px;
-  font-style: italic;
-  color: var(--accent);
-}
+.ai{margin-top:24px;font-style:italic;color:var(--accent)}
+ul{padding-left:20px}
 </style>
 </head>
 
 <body>
 
-<!-- ======================================================
-     BOOT SEQUENCE
-====================================================== -->
+<!-- BOOT -->
 <section class="screen active" id="boot">
   <div class="panel">
     <h1>HPOS</h1>
     <p>Human Potential Operating System</p>
-    <p>
-      HPOS initialized.<br>
-      This is not a test.<br>
-      This is a system to help you act in the real world.
-    </p>
-    <button onclick="OS.next('questionEngine')">Start</button>
+    <p>This is not a test.<br>This is a long-term system.</p>
+    <button onclick="OS.start()">Initialize</button>
   </div>
 </section>
 
-<!-- ======================================================
-     QUESTION ENGINE
-====================================================== -->
-<section class="screen" id="questionEngine">
+<!-- QUESTION ENGINE -->
+<section class="screen" id="questions">
   <div class="panel">
-    <h2 id="questionText"></h2>
-    <div id="questionOptions"></div>
-    <div class="ai-voice" id="aiGuide"></div>
+    <h2 id="qText"></h2>
+    <div id="qOpts"></div>
+    <div class="ai" id="aiLine"></div>
   </div>
 </section>
 
-<!-- ======================================================
-     COGNITIVE SUMMARY
-====================================================== -->
-<section class="screen" id="cognitiveSummary">
+<!-- SUMMARY -->
+<section class="screen" id="summary">
   <div class="panel">
-    <h2>Cognitive Map</h2>
-    <div id="cognitiveOutput"></div>
-    <div class="ai-voice" id="summaryAI"></div>
-    <button onclick="OS.next('executionEngine')">Proceed to Execution</button>
+    <h2>Cognitive Snapshot</h2>
+    <div id="summaryOut"></div>
+    <div class="ai" id="summaryAI"></div>
+    <button onclick="ProblemEngine.open()">View Problem Space</button>
   </div>
 </section>
 
-<!-- ======================================================
-     LIFE EXECUTION ENGINE
-====================================================== -->
-<section class="screen" id="executionEngine">
+<!-- PROBLEM MARKETPLACE -->
+<section class="screen" id="market">
   <div class="panel">
-    <h2>Life Execution Engine</h2>
-    <ul id="executionSteps"></ul>
-    <div class="ai-voice" id="executionAI"></div>
+    <h2>Problem Marketplace</h2>
+    <p>Select one problem to work on.</p>
+    <div id="problemList"></div>
+    <div class="ai" id="marketAI"></div>
+  </div>
+</section>
+
+<!-- EXECUTION -->
+<section class="screen" id="execution">
+  <div class="panel">
+    <h2 id="execTitle"></h2>
+    <ul id="execSteps"></ul>
+    <p><b>Points:</b> <span id="points"></span></p>
+    <div class="ai" id="execAI"></div>
+    <button onclick="Journey.nextWeek()">Complete Week</button>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="screen" id="journey">
+  <div class="panel">
+    <h2>Long-Term Journey</h2>
+    <ul id="journeyLog"></ul>
+    <div class="ai" id="journeyAI"></div>
   </div>
 </section>
 
 <script>
-/* ======================================================
-   HPOS CORE KERNEL
-====================================================== */
+/* ================= OS + MEMORY ================= */
+const OS={
+  screen:"boot",
+  data:JSON.parse(localStorage.getItem("HPOS"))||{
+    brain:{system:0,execution:0,emotion:0,structure:0},
+    points:0,
+    week:1,
+    history:[]
+  },
+  save(){localStorage.setItem("HPOS",JSON.stringify(this.data))},
+  show(id){
+    document.getElementById(this.screen).classList.remove("active")
+    document.getElementById(id).classList.add("active")
+    this.screen=id
+  },
+  start(){this.show("questions");QuestionEngine.load()}
+}
 
-const OS = {
-  currentScreen: 'boot',
-  next(id) {
-    document.getElementById(this.currentScreen).classList.remove('active');
-    document.getElementById(id).classList.add('active');
-    this.currentScreen = id;
-    if (id === 'questionEngine') QuestionEngine.load();
+/* ================= AI PERSONALITY STATES ================= */
+const AI={
+  states:{
+    observe:[
+      "I’m observing patterns, not judging.",
+      "No need to rush."
+    ],
+    resist:[
+      "Resistance usually protects something important.",
+      "Let’s not fight it."
+    ],
+    align:[
+      "This feels closer to how you think.",
+      "Alignment reduces effort."
+    ],
+    execute:[
+      "Small action. Real world.",
+      "Momentum matters."
+    ]
+  },
+  speak(state){
+    const pool=this.states[state]||this.states.observe
+    return pool[Math.floor(Math.random()*pool.length)]
   }
-};
+}
 
-/* ======================================================
-   COGNITIVE MODEL ENGINE
-====================================================== */
-
-const CognitiveModel = {
-  systemThinking: 0,
-  executionBias: 0,
-  emotionalLoad: 0,
-  ambiguityTolerance: 0,
-  autonomy: 0,
-
-  apply(effect) {
-    for (let key in effect) {
-      this[key] += effect[key];
-    }
-  }
-};
-
-/* ======================================================
-   QUESTION ENGINE (EXTENDABLE)
-====================================================== */
-
-const QuestionEngine = {
-  index: 0,
-
-  questions: [
-    {
-      text: "When something breaks, what do you do first?",
-      options: [
-        { text: "Understand why", effect: { systemThinking: 2 } },
-        { text: "Fix immediately", effect: { executionBias: 2 } },
-        { text: "Ask someone", effect: { ambiguityTolerance: -1 } },
-        { text: "Ignore for now", effect: { emotionalLoad: 1 } }
-      ]
-    },
-    {
-      text: "What drains you faster?",
-      options: [
-        { text: "No structure", effect: { systemThinking: 2 } },
-        { text: "Slow progress", effect: { executionBias: 2 } },
-        { text: "Unclear goals", effect: { ambiguityTolerance: -2 } },
-        { text: "Too many people", effect: { emotionalLoad: 1 } }
-      ]
-    }
-    // 🔥 ADD 500+ QUESTIONS HERE (same format)
+/* ================= QUESTION ENGINE ================= */
+const QuestionEngine={
+  i:0,
+  qs:[
+    "When something breaks, what do you do first?",
+    "What drains you faster?",
+    "What do you avoid starting?",
+    "What feels meaningless lately?",
+    "What gives quiet satisfaction?"
   ],
-
-  load() {
-    if (this.index >= this.questions.length) {
-      return SummaryEngine.generate();
-    }
-
-    const q = this.questions[this.index];
-    document.getElementById('questionText').innerText = q.text;
-
-    const optBox = document.getElementById('questionOptions');
-    optBox.innerHTML = "";
-
-    q.options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.innerText = opt.text;
-      btn.onclick = () => {
-        CognitiveModel.apply(opt.effect);
-        this.index++;
-        this.load();
-      };
-      optBox.appendChild(btn);
-    });
-
-    AIPersonality.speak('guide');
+  load(){
+    if(this.i>=20)return SummaryEngine.generate()
+    document.getElementById("qText").innerText=this.qs[this.i%this.qs.length]
+    const box=document.getElementById("qOpts");box.innerHTML=""
+    ;[
+      {t:"Understand deeply",e:{system:2}},
+      {t:"Act immediately",e:{execution:2}},
+      {t:"Wait",e:{structure:1}},
+      {t:"Avoid",e:{emotion:1}}
+    ].forEach(o=>{
+      const b=document.createElement("button")
+      b.innerText=o.t
+      b.onclick=()=>{
+        Object.keys(o.e).forEach(k=>OS.data.brain[k]+=o.e[k])
+        this.i++;OS.save();this.load()
+      }
+      box.appendChild(b)
+    })
+    document.getElementById("aiLine").innerText=AI.speak("observe")
   }
-};
+}
 
-/* ======================================================
-   AI PERSONALITY ENGINE
-====================================================== */
+/* ================= SUMMARY ================= */
+const SummaryEngine={
+  generate(){
+    OS.show("summary")
+    const b=OS.data.brain
+    summaryOut.innerHTML=`
+      <p>System Thinking: ${b.system}</p>
+      <p>Execution Bias: ${b.execution}</p>
+      <p>Emotional Load: ${b.emotion}</p>
+    `
+    summaryAI.innerText=AI.speak("align")
+  }
+}
 
-const AIPersonality = {
-  guideLines: [
-    "I am observing patterns, not judging.",
-    "There is no right answer here.",
-    "Clarity forms through action."
+/* ================= PROBLEM MARKETPLACE ================= */
+const ProblemEngine={
+  problems:[
+    {id:"learn",t:"Learning Without Application",fit:b=>b.system>5},
+    {id:"over",t:"Overthinking vs Execution",fit:b=>b.system>6&&b.execution<4},
+    {id:"dir",t:"Skill Without Direction",fit:b=>b.structure<3}
   ],
-  speak(mode) {
-    const line = this.guideLines[
-      Math.floor(Math.random() * this.guideLines.length)
-    ];
-    document.getElementById('aiGuide').innerText = line;
+  open(){
+    OS.show("market")
+    const list=document.getElementById("problemList");list.innerHTML=""
+    this.problems.forEach(p=>{
+      if(p.fit(OS.data.brain)){
+        const b=document.createElement("button")
+        b.innerText=p.t
+        b.onclick=()=>ExecutionEngine.start(p)
+        list.appendChild(b)
+      }
+    })
+    marketAI.innerText="Choose one problem. We go deep, not wide."
   }
-};
+}
 
-/* ======================================================
-   SUMMARY ENGINE
-====================================================== */
-
-const SummaryEngine = {
-  generate() {
-    OS.next('cognitiveSummary');
-
-    const out = `
-      <p>System Thinking: ${CognitiveModel.systemThinking}</p>
-      <p>Execution Bias: ${CognitiveModel.executionBias}</p>
-      <p>Emotional Load: ${CognitiveModel.emotionalLoad}</p>
-    `;
-    document.getElementById('cognitiveOutput').innerHTML = out;
-
-    document.getElementById('summaryAI').innerText =
-      "This is not a label. This is a snapshot.";
+/* ================= EXECUTION + POINTS ================= */
+const ExecutionEngine={
+  start(problem){
+    OS.data.problem=problem.id
+    OS.show("execution")
+    execTitle.innerText=problem.t
+    execSteps.innerHTML=""
+    ;[
+      "Observe for 7 days",
+      "Change one thing",
+      "Test with reality",
+      "Simplify"
+    ].forEach(s=>{
+      const li=document.createElement("li");li.innerText=s
+      execSteps.appendChild(li)
+    })
+    points.innerText=OS.data.points
+    execAI.innerText=AI.speak("execute")
+    OS.save()
   }
-};
+}
 
-/* ======================================================
-   LIFE EXECUTION ENGINE
-====================================================== */
-
-const ExecutionEngine = {
-  steps: [
-    "Observe your behavior without fixing",
-    "Change one small thing",
-    "Test it in the real world",
-    "Simplify what works"
-  ],
-
-  init() {
-    const list = document.getElementById('executionSteps');
-    list.innerHTML = "";
-    this.steps.forEach(s => {
-      const li = document.createElement('li');
-      li.innerText = s;
-      list.appendChild(li);
-    });
-
-    document.getElementById('executionAI').innerText =
-      "Execution begins when resistance is respected.";
+/* ================= JOURNEY ================= */
+const Journey={
+  nextWeek(){
+    OS.data.points+=10
+    OS.data.history.push(`Week ${OS.data.week} completed`)
+    OS.data.week++
+    OS.save()
+    this.view()
+  },
+  view(){
+    OS.show("journey")
+    journeyLog.innerHTML=""
+    OS.data.history.forEach(h=>{
+      const li=document.createElement("li");li.innerText=h
+      journeyLog.appendChild(li)
+    })
+    journeyAI.innerText="This is a long game. You are still here."
   }
-};
-
-document.getElementById('executionEngine').addEventListener('click', () => {
-  ExecutionEngine.init();
-});
+}
 </script>
-
 </body>
 </html>
