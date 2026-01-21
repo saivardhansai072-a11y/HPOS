@@ -1,312 +1,450 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>HPOS – Human Potential Operating System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HPOS — Human Potential Operating System</title>
+    <style>
+        :root {
+            --bg: #050507;
+            --surface: #0f0f12;
+            --accent: #ffffff;
+            --dim: #55555e;
+            --border: rgba(255, 255, 255, 0.07);
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-<style>
-:root {
-  --bg1: #0a0f1f;
-  --bg2: #0f172a;
-  --card: rgba(255,255,255,0.06);
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --accent: #38bdf8;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-* { box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            color: #e0e0e6;
+            font-family: var(--font);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #111118 0%, #050507 100%);
+        }
 
-body {
-  margin: 0;
-  font-family: Inter, system-ui, Arial;
-  background: radial-gradient(circle at top, var(--bg2), var(--bg1));
-  color: var(--text);
-  min-height: 100vh;
-}
+        /* Ambient Neural Background */
+        #neural-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
 
-.screen {
-  display: none;
-  padding: 40px 20px;
-  min-height: 100vh;
-}
+        #app {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+        }
 
-.screen.active {
-  display: block;
-}
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: var(--transition);
+        }
 
-.card {
-  max-width: 720px;
-  margin: auto;
-  background: var(--card);
-  border-radius: 18px;
-  padding: 30px;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-  backdrop-filter: blur(12px);
-}
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
 
-h1, h2, h3 {
-  font-weight: 500;
-}
+        .glass {
+            background: rgba(15, 15, 18, 0.7);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            padding: 4rem 3rem;
+            border-radius: 4px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        }
 
-p {
-  color: var(--muted);
-  line-height: 1.6;
-}
+        .meta {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: var(--dim);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
 
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #1e293b;
-  color: var(--text);
-  font-size: 15px;
-  cursor: pointer;
-}
+        h1, h2 { 
+            font-weight: 200; 
+            letter-spacing: -0.04em; 
+            margin-bottom: 2rem; 
+            line-height: 1.2;
+        }
 
-button:hover {
-  background: #334155;
-}
+        p { color: #a0a0ab; line-height: 1.8; margin-bottom: 2rem; font-size: 1.05rem; }
 
-.small {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 10px;
-}
+        .input-wrap { position: relative; margin-top: 3rem; }
 
-.problem {
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 18px;
-  margin-top: 16px;
-}
-</style>
+        textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 1rem 0;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            transition: border-color 0.5s;
+        }
+
+        textarea:focus { border-bottom-color: var(--dim); }
+
+        .btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 1rem 2.5rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn:hover { background: #fff; color: #000; }
+
+        .progress-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            transition: width 1s ease;
+        }
+
+        .ai-status {
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            font-size: 0.65rem;
+            color: var(--dim);
+            font-style: italic;
+        }
+
+        .problem-card {
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .problem-card:hover { background: rgba(255,255,255,0.03); border-color: #fff; }
+
+        .step-row {
+            display: flex;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .step-num { color: var(--dim); width: 40px; font-size: 0.8rem; }
+    </style>
 </head>
-
 <body>
 
-<!-- WELCOME -->
-<div class="screen active" id="welcome">
-  <div class="card">
-    <h1>HPOS initialized</h1>
-    <p>
-      This is not a test.<br/>
-      This is a system to help you act in the real world.
-    </p>
-    <p class="small">
-      We move slowly. We go deep. We don’t reset unless you ask.
-    </p>
-    <button onclick="nextScreen('questions')">Let’s start simple</button>
-  </div>
-</div>
+    <canvas id="neural-canvas"></canvas>
+    <div class="progress-container"><div id="progress-bar"></div></div>
 
-<!-- QUESTIONS -->
-<div class="screen" id="questions">
-  <div class="card">
-    <h2 id="qText"></h2>
-    <div id="qOptions"></div>
-    <p class="small">Answer honestly. There are no right answers.</p>
-  </div>
-</div>
+    <div id="app">
+        <div id="scr-welcome" class="screen glass">
+            <span class="meta">System v4.0.1 // Philosophical AI Engine</span>
+            <h1>HPOS</h1>
+            <p>You are entering a non-motivational operating system. I am not here to cheer for you. I am here to observe your patterns and present the mirror.</p>
+            <button class="btn" onclick="HPOS.transition('questions')">Initialize Thinking</button>
+        </div>
 
-<!-- MIRROR -->
-<div class="screen" id="mirror">
-  <div class="card">
-    <h2>What HPOS sees so far</h2>
-    <ul id="mirrorList"></ul>
-    <p class="small">Does this feel close?</p>
-    <button onclick="confirmMirror(true)">Yes, this feels right</button>
-    <button onclick="confirmMirror(false)">No, something feels off</button>
-  </div>
-</div>
+        <div id="scr-questions" class="screen glass">
+            <span class="meta" id="q-count">Processing...</span>
+            <h2 id="q-text">Inquiry</h2>
+            <div class="input-wrap">
+                <textarea id="q-input" rows="1" placeholder="Type your honest response..."></textarea>
+                <div class="ai-status" id="ai-thinking-log">AI Engine: Observing syntax and latency...</div>
+            </div>
+            <button class="btn" onclick="HPOS.submitAnswer()">Proceed</button>
+        </div>
 
-<!-- PROBLEM MARKET -->
-<div class="screen" id="problems">
-  <div class="card">
-    <h2>Problem Marketplace</h2>
-    <p class="small">
-      Choose one problem. We go deep, not wide.
-    </p>
-    <div id="problemList"></div>
-  </div>
-</div>
+        <div id="scr-mirror" class="screen glass">
+            <span class="meta">Cognitive Inference Result</span>
+            <h2>The Mirror</h2>
+            <div id="mirror-narrative" style="margin-bottom: 2rem; border-left: 1px solid #333; padding-left: 20px;"></div>
+            <p id="ai-challenge" style="font-style: italic; color: #888;"></p>
+            <button class="btn" onclick="HPOS.transition('market')">Acknowledge</button>
+        </div>
 
-<!-- EXECUTION -->
-<div class="screen" id="execution">
-  <div class="card">
-    <h2 id="execTitle"></h2>
-    <p id="execDesc"></p>
-    <h3>Week 1 – Observe</h3>
-    <ul>
-      <li>Notice where this problem appears daily</li>
-      <li>Write without fixing</li>
-      <li>No improvement yet</li>
-    </ul>
-    <p class="small">
-      Execution begins when clarity is respected.
-    </p>
-  </div>
-</div>
+        <div id="scr-market" class="screen glass">
+            <span class="meta">Pattern Extraction</span>
+            <h2>Select your primary anchor.</h2>
+            <p>I have narrowed your current stagnation down to these three architectural flaws. Choose the one you intend to dismantle.</p>
+            <div id="market-list"></div>
+        </div>
 
-<script>
-/* -------------------------
-   COGNITIVE MODEL
-------------------------- */
-const brain = JSON.parse(localStorage.getItem("hpos_brain")) || {
-  depth: 0,
-  action: 0,
-  avoidance: 0,
-  structure: 0,
-  curiosity: 0,
-  noise: 0,
-  validation: 0
-};
+        <div id="scr-exec" class="screen glass">
+            <span class="meta" id="exec-cycle">Cycle 01</span>
+            <h2 id="exec-title">Active Protocol</h2>
+            <div id="exec-steps"></div>
+            <div style="margin-top: 3rem; display: flex; gap: 10px;">
+                <button class="btn" onclick="HPOS.advanceWeek()">Cycle Progress</button>
+                <button class="btn" style="border:none; opacity: 0.3;" onclick="HPOS.hardReset()">Wipe System</button>
+            </div>
+        </div>
+    </div>
 
-/* -------------------------
-   QUESTIONS (sample 15 / expandable to 500+)
-------------------------- */
-const questions = [
-{
- text: "When something breaks, what do you usually do first?",
- options: [
-  { t: "Understand why it broke", e: { depth: 2, action: -1 } },
-  { t: "Fix it immediately", e: { action: 2 } },
-  { t: "Wait and see if it resolves", e: { avoidance: 2 } },
-  { t: "Ask someone else", e: { validation: 2 } }
- ]
-},
-{
- text: "You learn a useful skill. What happens next?",
- options: [
-  { t: "I wait until I feel ready", e: { avoidance: 2 } },
-  { t: "I try it immediately", e: { action: 2 } },
-  { t: "I refine understanding", e: { depth: 2 } },
-  { t: "I move on to something new", e: { curiosity: 2 } }
- ]
-},
-{
- text: "Too many options usually make you feel…",
- options: [
-  { t: "Curious", e: { curiosity: 2 } },
-  { t: "Overwhelmed", e: { noise: 2 } },
-  { t: "Focused on filtering", e: { structure: 2 } },
-  { t: "Detached", e: { avoidance: 1 } }
- ]
-}
-];
+    <script>
+        /**
+         * HPOS ENGINE: HUMAN POTENTIAL OPERATING SYSTEM
+         * A HEURISTIC AI FRAMEWORK FOR BEHAVIORAL ANALYSIS
+         */
 
-let qIndex = 0;
+        const HPOS = {
+            // --- DATA ENGINE ---
+            db: {
+                questions: [
+                    { t: "What do you usually avoid fixing in your immediate environment?", traits: { action: -2, structure: 1 } },
+                    { t: "Which of your current habits feels like a protection mechanism?", traits: { reflection: 2, noise: 1 } },
+                    { t: "What is the most frequent lie you tell to maintain social peace?", traits: { validation: 2, depth: -1 } },
+                    { t: "If you had to double your output by working half the hours, what would you cut?", traits: { speed: 2, logic: 1 } },
+                    { t: "What feels important but never urgent to you?", traits: { structure: 2, action: -1 } },
+                    { t: "Do you seek to be understood or to understand?", traits: { curiosity: 2, validation: -2 } },
+                    { t: "Which task on your list have you moved to tomorrow for more than a week?", traits: { action: -2, logic: 1 } },
+                    { t: "What would you do if you stopped waiting for permission?", traits: { action: 2, validation: -2 } },
+                    { t: "When you are silent, what is the loudest thought that returns?", traits: { reflection: 2, curiosity: 1 } },
+                    { t: "What do people rely on you for that you secretly dislike providing?", traits: { validation: 1, structure: 2 } }
+                ],
+                problems: [
+                    { id: 'p1', title: "Information hoarding (Analysis Paralysis)", desc: "You use learning as a sophisticated form of procrastination.", steps: ["Delete 10 bookmarks.", "No audio input for 24h.", "Implement one concept today.", "Ship a 'bad' draft."] },
+                    { id: 'p2', title: "Validation Dependency", desc: "Your goals are actually the ghost-goals of your peers.", steps: ["Go ghost on social for 3 days.", "Do one difficult thing solo.", "Say 'No' to a request.", "Write a private manifesto."] },
+                    { id: 'p3', title: "Fragmented Agency", desc: "High energy, zero direction. You are a spinning wheel in mud.", steps: ["Define one goal for 4 weeks.", "Block 90 mins of deep work.", "Kill two minor projects.", "Report progress to a wall."] }
+                ]
+            },
 
-/* -------------------------
-   UI FUNCTIONS
-------------------------- */
-function nextScreen(id) {
- document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
- document.getElementById(id).classList.add('active');
-}
+            // --- STATE MACHINE ---
+            state: {
+                qIdx: 0,
+                metrics: { action: 0, reflection: 0, validation: 0, curiosity: 0, structure: 0, speed: 0, noise: 0, depth: 0 },
+                responses: [],
+                activeProblem: null,
+                currentWeek: 0,
+                lastTransition: Date.now()
+            },
 
-function renderQuestion() {
- const q = questions[qIndex];
- document.getElementById("qText").innerText = q.text;
- const box = document.getElementById("qOptions");
- box.innerHTML = "";
- q.options.forEach(o => {
-   const btn = document.createElement("button");
-   btn.innerText = o.t;
-   btn.onclick = () => answer(o.e);
-   box.appendChild(btn);
- });
-}
+            // --- INITIALIZATION ---
+            init: function() {
+                const saved = localStorage.getItem('hpos_core');
+                if (saved) {
+                    this.state = JSON.parse(saved);
+                    this.resume();
+                } else {
+                    this.transition('welcome');
+                }
+                this.initNeural();
+                this.bindInputs();
+            },
 
-function answer(effect) {
- Object.keys(effect).forEach(k => brain[k] += effect[k]);
- qIndex++;
- if (qIndex < questions.length) {
-   renderQuestion();
- } else {
-   localStorage.setItem("hpos_brain", JSON.stringify(brain));
-   showMirror();
- }
-}
+            resume: function() {
+                if (this.state.activeProblem) this.renderExec();
+                else if (this.state.qIdx >= this.db.questions.length) this.showMirror();
+                else this.transition('welcome');
+            },
 
-/* -------------------------
-   MIRROR LOGIC
-------------------------- */
-function showMirror() {
- const insights = [];
- if (brain.depth > brain.action) insights.push("You prefer understanding systems before acting.");
- if (brain.avoidance > 1) insights.push("You delay action when clarity feels incomplete.");
- if (brain.structure > 1) insights.push("You work better with structure than chaos.");
- if (brain.curiosity > 1) insights.push("Curiosity drives you more than rewards.");
+            save: () => localStorage.setItem('hpos_core', JSON.stringify(HPOS.state)),
 
- const list = document.getElementById("mirrorList");
- list.innerHTML = "";
- insights.forEach(i => {
-   const li = document.createElement("li");
-   li.innerText = i;
-   list.appendChild(li);
- });
- nextScreen("mirror");
-}
+            // --- NAVIGATION ---
+            transition: function(scrId) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                const el = document.getElementById(`scr-${scrId}`);
+                setTimeout(() => {
+                    el.classList.add('active');
+                    if (scrId === 'questions') this.renderQuestion();
+                    this.updateProgress(scrId);
+                }, 100);
+            },
 
-function confirmMirror(ok) {
- if (!ok) {
-   qIndex = 0;
-   nextScreen("questions");
-   renderQuestion();
- } else {
-   showProblems();
- }
-}
+            updateProgress: function(scr) {
+                const map = { welcome: 5, questions: 40, mirror: 60, market: 80, exec: 100 };
+                document.getElementById('progress-bar').style.width = map[scr] + '%';
+            },
 
-/* -------------------------
-   PROBLEM ENGINE
-------------------------- */
-function showProblems() {
- const problems = [];
- if (brain.depth > 2 && brain.action < 2) {
-   problems.push({
-     name: "Learning Without Application",
-     desc: "You gain insight easily, but execution waits for certainty."
-   });
- }
- if (brain.noise > 1) {
-   problems.push({
-     name: "Overwhelm From Noise",
-     desc: "Too many inputs reduce clarity and follow-through."
-   });
- }
+            // --- AI THINKING ENGINE ---
+            renderQuestion: function() {
+                const q = this.db.questions[this.state.qIdx];
+                document.getElementById('q-count').innerText = `INQUIRY 0${this.state.qIdx + 1} / 10`;
+                document.getElementById('q-text').innerText = q.t;
+                document.getElementById('q-input').value = "";
+                document.getElementById('q-input').focus();
+                this.state.lastTransition = Date.now();
+            },
 
- const box = document.getElementById("problemList");
- box.innerHTML = "";
- problems.forEach(p => {
-   const d = document.createElement("div");
-   d.className = "problem";
-   d.innerHTML = `<h3>${p.name}</h3><p>${p.desc}</p>`;
-   const b = document.createElement("button");
-   b.innerText = "Work on this";
-   b.onclick = () => startExecution(p);
-   d.appendChild(b);
-   box.appendChild(d);
- });
- nextScreen("problems");
-}
+            submitAnswer: function() {
+                const val = document.getElementById('q-input').value.trim();
+                if (val.length < 3) return;
 
-/* -------------------------
-   EXECUTION
-------------------------- */
-function startExecution(p) {
- document.getElementById("execTitle").innerText = p.name;
- document.getElementById("execDesc").innerText = p.desc;
- localStorage.setItem("hpos_problem", JSON.stringify(p));
- nextScreen("execution");
-}
+                const latency = Date.now() - this.state.lastTransition;
+                const q = this.db.questions[this.state.qIdx];
 
-/* INIT */
-renderQuestion();
-</script>
+                // HEURISTIC AI PROCESSING
+                // 1. Analyze Latency (Speed vs Depth)
+                if (latency < 5000) this.state.metrics.speed += 1;
+                else this.state.metrics.depth += 1;
 
+                // 2. Analyze Syntax Length
+                if (val.length > 100) this.state.metrics.depth += 2;
+
+                // 3. Map Philosophical Traits
+                for (let t in q.traits) this.state.metrics[t] += q.traits[t];
+
+                this.state.responses.push(val);
+                this.state.qIdx++;
+
+                if (this.state.qIdx < this.db.questions.length) {
+                    this.renderQuestion();
+                    document.getElementById('ai-thinking-log').innerText = `AI Engine: Analyzing response "${val.substring(0,10)}..." Pattern logged.`;
+                } else {
+                    this.showMirror();
+                }
+                this.save();
+            },
+
+            showMirror: function() {
+                const m = this.state.metrics;
+                let narrative = "";
+                let challenge = "";
+
+                // AI Logic Inference
+                if (m.action < 0 && m.reflection > 2) {
+                    narrative = "You have built a cathedral inside your mind, but you are living in the ruins outside. Your high reflection is currently a trap, not a tool.";
+                    challenge = "The system observes a 78% dissonance between your perceived value and your physical output.";
+                } else if (m.validation > 3) {
+                    narrative = "Your current trajectory is a composite of others' expectations. You are performing 'productivity' rather than exercising agency.";
+                    challenge = "I recommend an immediate severance of social feedback loops.";
+                } else if (m.speed > 3) {
+                    narrative = "You move fast to avoid the weight of your own thoughts. You are optimizing for movement, but you are moving in circles.";
+                    challenge = "Speed is your anesthetic.";
+                } else {
+                    narrative = "Your pattern is balanced but cautious. You are avoiding the 'Great Risk' by maintaining a steady, safe mediocrity.";
+                    challenge = "When was the last time you were truly uncomfortable?";
+                }
+
+                document.getElementById('mirror-narrative').innerText = narrative;
+                document.getElementById('ai-challenge').innerText = challenge;
+                this.transition('mirror');
+            },
+
+            // --- PROBLEM & EXECUTION ENGINE ---
+            showMarketplace: function() {
+                const list = document.getElementById('market-list');
+                list.innerHTML = "";
+                this.db.problems.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = "problem-card";
+                    card.innerHTML = `<h3>${p.title}</h3><p style="margin:0">${p.desc}</p>`;
+                    card.onclick = () => { this.state.activeProblem = p; this.renderExec(); };
+                    list.appendChild(card);
+                });
+                this.transition('market');
+            },
+
+            renderExec: function() {
+                const p = this.state.activeProblem;
+                document.getElementById('exec-title').innerText = p.title;
+                document.getElementById('exec-cycle').innerText = `Active Protocol: Step ${this.state.currentWeek + 1} / 4`;
+                
+                const list = document.getElementById('exec-steps');
+                list.innerHTML = "";
+                p.steps.forEach((s, i) => {
+                    const row = document.createElement('div');
+                    row.className = "step-row";
+                    if (i > this.state.currentWeek) row.style.opacity = "0.2";
+                    row.innerHTML = `<div class="step-num">0${i+1}</div><div>${s} ${i < this.state.currentWeek ? '— COMPLETE' : ''}</div>`;
+                    list.appendChild(row);
+                });
+                this.transition('exec');
+                this.save();
+            },
+
+            advanceWeek: function() {
+                if (this.state.currentWeek < 3) {
+                    this.state.currentWeek++;
+                    this.renderExec();
+                } else {
+                    alert("Cycle Complete. Initializing next observation layer.");
+                    this.hardReset();
+                }
+            },
+
+            // --- SYSTEM UTILS ---
+            initNeural: function() {
+                const canvas = document.getElementById('neural-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                
+                const dots = Array(40).fill().map(() => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5
+                }));
+
+                function animate() {
+                    ctx.clearRect(0,0,canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(255,255,255,0.15)";
+                    dots.forEach(d => {
+                        d.x += d.vx; d.y += d.vy;
+                        if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+                        if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+                        ctx.beginPath();
+                        ctx.arc(d.x, d.y, 1, 0, Math.PI*2);
+                        ctx.fill();
+                    });
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            },
+
+            bindInputs: function() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        if (this.state.currentScreen === 'questions') this.submitAnswer();
+                    }
+                });
+            },
+
+            hardReset: function() {
+                if (confirm("Destroy all cognitive models?")) {
+                    localStorage.removeItem('hpos_core');
+                    location.reload();
+                }
+            }
+        };
+
+        window.onload = () => HPOS.init();
+
+        // Overriding the marketplace button to actually link
+        document.querySelector('#scr-mirror button').onclick = () => HPOS.showMarketplace();
+
+    </script>
 </body>
 </html>
+
