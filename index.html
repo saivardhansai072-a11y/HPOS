@@ -1,293 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPOS — Human Potential Operating System</title>
-    <style>
-        :root {
-            --bg: #030303;
-            --surface: #0a0a0c;
-            --accent: #ffffff;
-            --dim: #444444;
-            --border: rgba(255, 255, 255, 0.08);
-            --font: 'Inter', -apple-system, system-ui, sans-serif;
-            --transition: all 0.6s cubic-bezier(0.2, 1, 0.2, 1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPOS — Human Potential Operating System</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-
-        body {
-            background-color: var(--bg);
-            color: #ececec;
-            font-family: var(--font);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #0d0d12 0%, #030303 100%);
-        }
-
-        #app { width: 100%; max-width: 700px; padding: 30px; z-index: 10; }
-
-        .screen {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: var(--transition);
-        }
-
-        .screen.active { display: block; opacity: 1; transform: translateY(0); }
-
-        .glass {
-            background: rgba(10, 10, 12, 0.8);
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--border);
-            padding: 4rem;
-            border-radius: 2px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
-        }
-
-        .meta {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5em;
-            color: var(--dim);
-            margin-bottom: 2rem;
-            display: block;
-        }
-
-        h1, h2 { font-weight: 200; letter-spacing: -0.05em; margin-bottom: 1.5rem; line-height: 1.1; }
-        p { color: #888; line-height: 1.8; margin-bottom: 2rem; font-size: 1rem; }
-
-        .option-btn {
-            display: block;
-            width: 100%;
-            background: transparent;
-            color: #aaa;
-            border: 1px solid var(--border);
-            padding: 1.2rem;
-            margin-bottom: 10px;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.95rem;
-        }
-
-        .option-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .btn-main {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            margin-top: 1rem;
-        }
-
-        .progress-bar {
-            position: fixed;
-            top: 0; left: 0; height: 1px;
-            background: #fff;
-            transition: width 0.8s ease;
-        }
-
-        #ai-log {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            font-family: monospace;
-            font-size: 0.6rem;
-            color: #333;
-            max-width: 300px;
-        }
-
-        .summary-box {
-            background: #000;
-            padding: 1.5rem;
-            border: 1px solid #222;
-            color: #0f0;
-            font-family: monospace;
-            font-size: 0.85rem;
-            margin-bottom: 2rem;
-            white-space: pre-wrap;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-    </style>
+<style>
+:root{
+  --bg:#050505;
+  --card:#0c0c0e;
+  --border:rgba(255,255,255,.12);
+  --text:#eaeaea;
+  --muted:#9aa0a6;
+  --accent:#ffffff;
+  --font:system-ui,-apple-system,Segoe UI,Inter,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+#app{width:100%;max-width:720px;padding:20px}
+.screen{display:none;opacity:0;transform:translateY(12px);transition:.5s}
+.screen.active{display:block;opacity:1;transform:none}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:32px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+h1{font-weight:300;font-size:1.9rem;margin-bottom:12px}
+p{color:var(--muted);line-height:1.6;margin-bottom:20px}
+button{
+  width:100%;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  text-align:left;
+  transition:.2s;
+}
+button:hover{background:rgba(255,255,255,.12)}
+.ai{margin-top:16px;font-style:italic;color:#bdbdbd}
+.progress{position:fixed;top:0;left:0;height:3px;background:#fff;transition:.3s}
+.problem{border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px}
+pre{white-space:pre-wrap;font-size:.8rem;background:#000;padding:12px;border:1px solid #333}
+</style>
 </head>
+
 <body>
+<div class="progress" id="bar"></div>
 
-    <div class="progress-bar" id="p-bar"></div>
-    <div id="ai-log">SYSTEM_IDLE...</div>
+<div id="app">
 
-    <div id="app">
-        <div id="scr-welcome" class="screen active glass">
-            <span class="meta">HPOS v5.0 // Cognitive Architect</span>
-            <h1>Initialize Potential.</h1>
-            <p>I am a philosopher-engineer engine. I will ask questions to map your internal geometry. Be honest; the system only works if you are transparent with yourself.</p>
-            <button class="btn-main" onclick="HPOS.start()">Begin Inquiry</button>
-        </div>
+<!-- START -->
+<div id="scr-start" class="screen active card">
+  <h1>HPOS initialized</h1>
+  <p>This is not a test.  
+     This is a system to help you act in the real world.</p>
+  <button onclick="Engine.start('logic')">LOGIC — I trust structure</button>
+  <button onclick="Engine.start('emotion')">INTUITION — I trust feeling</button>
+  <button onclick="Engine.start('action')">EXECUTION — I learn by doing</button>
+</div>
 
-        <div id="scr-question" class="screen glass">
-            <span class="meta" id="q-meta">ANALYSIS_PHASE</span>
-            <h2 id="q-text">Query...</h2>
-            <div id="q-options"></div>
-        </div>
+<!-- QUESTIONS -->
+<div id="scr-q" class="screen card">
+  <h1 id="qText"></h1>
+  <div id="qOpts"></div>
+  <div class="ai" id="aiLine"></div>
+</div>
 
-        <div id="scr-mirror" class="screen glass">
-            <span class="meta">Cognitive Mirror</span>
-            <h2>The System Result</h2>
-            <p id="mirror-desc"></p>
-            <button class="btn-main" onclick="HPOS.showFinal()">Generate Export</button>
-        </div>
+<!-- MIRROR -->
+<div id="scr-mirror" class="screen card">
+  <h1>What HPOS sees</h1>
+  <ul id="mirrorList"></ul>
+  <p>Does this feel accurate?</p>
+  <button onclick="Engine.confirmMirror(true)">Yes</button>
+  <button onclick="Engine.confirmMirror(false)">Not quite</button>
+</div>
 
-        <div id="scr-final" class="screen glass">
-            <span class="meta">Neural Export</span>
-            <h2>Deep Integration</h2>
-            <p>Your cognitive map is complete. Copy the block below and paste it into Gemini. Gemini will then act as your master guide to rewire your brain in this specific domain.</p>
-            <div class="summary-box" id="export-code"></div>
-            <button class="btn-main" onclick="HPOS.copyExport()">Copy Map</button>
-            <p style="margin-top:20px; font-size: 0.8rem;"><i>Next Step: Tell Gemini: "Analyze this HPOS map and improve my brain in [Target Topic]."</i></p>
-        </div>
-    </div>
+<!-- PROBLEM -->
+<div id="scr-problem" class="screen card">
+  <h1>Problem that fits you</h1>
+  <div id="problemBox"></div>
+</div>
 
-    <script>
-        const HPOS = {
-            state: {
-                currentQ: null,
-                history: [],
-                score: { logic: 0, agency: 0, reflection: 0, speed: 0 },
-                count: 0
-            },
+<!-- CONTINUE -->
+<div id="scr-continue" class="screen card">
+  <h1>HPOS will continue with you</h1>
+  <p>I’ll now guide you step by step inside ChatGPT.</p>
+  <pre id="handoff"></pre>
+  <button onclick="Engine.openChatGPT()">Continue with HPOS</button>
+</div>
 
-            // Philosophically branched questions
-            questions: [
-                {
-                    id: 'start',
-                    text: "What drives your current movement?",
-                    options: [
-                        { t: "The fear of staying the same.", next: 'fear', s: { agency: 1, reflection: 1 } },
-                        { t: "The desire for a specific result.", next: 'result', s: { logic: 2, speed: 1 } },
-                        { t: "I am currently not moving; I am observing.", next: 'observe', s: { reflection: 3, agency: -1 } }
-                    ]
-                },
-                {
-                    id: 'fear',
-                    text: "If fear is the fuel, what happens when you reach safety?",
-                    options: [
-                        { t: "I find a new fear to keep running.", next: 'loop', s: { speed: 2, logic: -1 } },
-                        { t: "I stagnate until pain forces me to move.", next: 'stagnate', s: { agency: -2, reflection: 1 } }
-                    ]
-                },
-                {
-                    id: 'result',
-                    text: "Do you value the outcome or the identity required to achieve it?",
-                    options: [
-                        { t: "The outcome. The ends justify the struggle.", next: 'logic_path', s: { logic: 3, speed: 2 } },
-                        { t: "The identity. I want to become the person who can.", next: 'identity_path', s: { reflection: 2, agency: 2 } }
-                    ]
-                },
-                {
-                    id: 'observe',
-                    text: "Is your observation a form of wisdom or a sophisticated delay?",
-                    options: [
-                        { t: "Wisdom. I am gathering necessary data.", next: 'data', s: { logic: 2, reflection: 2 } },
-                        { t: "Delay. I am afraid to commit to a direction.", next: 'fear', s: { reflection: 1, agency: -2 } }
-                    ]
-                }
-                // More complex branching logic follows the same pattern...
-            ],
+</div>
 
-            start: function() {
-                this.state.currentQ = this.questions.find(q => q.id === 'start');
-                this.render();
-            },
+<script>
+const Engine={
+  screen:"scr-start",
+  path:"",
+  i:0,
+  brain:{depth:0,action:0,emotion:0,structure:0,avoidance:0},
+  history:[],
 
-            render: function() {
-                this.showScreen('question');
-                document.getElementById('q-text').innerText = this.state.currentQ.text;
-                const optContainer = document.getElementById('q-options');
-                optContainer.innerHTML = '';
-                
-                this.state.currentQ.options.forEach(opt => {
-                    const b = document.createElement('button');
-                    b.className = 'option-btn';
-                    b.innerText = opt.t;
-                    b.onclick = () => this.handleAnswer(opt);
-                    optContainer.appendChild(b);
-                });
+  aiLines:[
+    "I’m observing patterns.",
+    "No need to rush.",
+    "This isn’t random.",
+    "Clarity forms slowly."
+  ],
 
-                this.log(`AI_MONITOR: Latency Check... Processing ${this.state.count}`);
-                document.getElementById('p-bar').style.width = (this.state.count * 10) + '%';
-            },
+  questions:[
+    {
+      q:"When something breaks, what do you do first?",
+      o:[
+        {t:"Understand why",e:{depth:2}},
+        {t:"Fix immediately",e:{action:2}},
+        {t:"Wait and watch",e:{avoidance:2}},
+        {t:"Ask someone",e:{emotion:1}}
+      ]
+    },
+    {
+      q:"You learn something useful. What usually happens?",
+      o:[
+        {t:"I wait until confident",e:{avoidance:2}},
+        {t:"I try it quickly",e:{action:2}},
+        {t:"I deepen understanding",e:{depth:2}},
+        {t:"I move on",e:{emotion:1}}
+      ]
+    },
+    {
+      q:"Too many options make you feel…",
+      o:[
+        {t:"Curious",e:{depth:1}},
+        {t:"Overwhelmed",e:{avoidance:2}},
+        {t:"Need structure",e:{structure:2}},
+        {t:"Detached",e:{emotion:1}}
+      ]
+    }
+  ],
 
-            handleAnswer: function(opt) {
-                // Update scores
-                for (let k in opt.s) this.state.score[k] += opt.s[k];
-                this.state.history.push({ q: this.state.currentQ.text, a: opt.t });
-                this.state.count++;
+  start(p){
+    this.path=p;
+    this.i=0;
+    this.show("scr-q");
+    this.renderQ();
+  },
 
-                // Branch or Finish
-                let nextQ = this.questions.find(q => q.id === opt.next);
-                
-                if (nextQ && this.state.count < 6) {
-                    this.state.currentQ = nextQ;
-                    this.render();
-                } else {
-                    this.generateMirror();
-                }
-            },
+  renderQ(){
+    const q=this.questions[this.i];
+    qText.innerText=q.q;
+    qOpts.innerHTML="";
+    q.o.forEach(opt=>{
+      const b=document.createElement("button");
+      b.innerText=opt.t;
+      b.onclick=()=>this.answer(opt);
+      qOpts.appendChild(b);
+    });
+    aiLine.innerText=this.aiLines[Math.floor(Math.random()*this.aiLines.length)];
+    bar.style.width=((this.i+1)/this.questions.length)*100+"%";
+  },
 
-            generateMirror: function() {
-                const s = this.state.score;
-                let desc = "";
-                if (s.reflection > s.agency) {
-                    desc = "Your architecture is heavy on contemplation. You are an 'Internal Architect' who builds vast mental structures but lacks the physical friction to manifest them. Gemini will help you convert this thought into raw execution.";
-                } else {
-                    desc = "Your architecture is built for speed and results. You are a 'Kinetic Engine' but you risk burning out by running without a map. Gemini will help you ground your speed in deep philosophy.";
-                }
-                document.getElementById('mirror-desc').innerText = desc;
-                this.showScreen('mirror');
-            },
+  answer(opt){
+    Object.keys(opt.e).forEach(k=>this.brain[k]+=opt.e[k]);
+    this.history.push({q:this.questions[this.i].q,a:opt.t});
+    this.i++;
+    if(this.i<this.questions.length){
+      this.renderQ();
+    }else{
+      this.mirror();
+    }
+  },
 
-            showFinal: function() {
-                this.showScreen('final');
-                const exportData = {
-                    system: "HPOS_NEURAL_MAP",
-                    user_profile: this.state.score,
-                    trajectory: this.state.history,
-                    philosophy_status: "DEEP_SKEPTICISM_RESOLVED"
-                };
-                document.getElementById('export-code').innerText = JSON.stringify(exportData, null, 2);
-            },
+  mirror(){
+    this.show("scr-mirror");
+    mirrorList.innerHTML="";
+    if(this.brain.depth>this.brain.action)
+      mirrorList.innerHTML+="<li>You prefer understanding before acting.</li>";
+    if(this.brain.avoidance>1)
+      mirrorList.innerHTML+="<li>You delay action when clarity feels missing.</li>";
+    if(this.brain.structure>1)
+      mirrorList.innerHTML+="<li>You rely on structure for stability.</li>";
+  },
 
-            copyExport: function() {
-                const text = document.getElementById('export-code').innerText;
-                navigator.clipboard.writeText(text).then(() => {
-                    alert("Cognitive Map Copied. Paste this to Gemini now.");
-                });
-            },
+  confirmMirror(ok){
+    if(!ok){this.i=0;this.show("scr-q");this.renderQ();return;}
+    this.assignProblem();
+  },
 
-            showScreen: function(id) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(`scr-${id}`).classList.add('active');
-            },
+  assignProblem(){
+    this.show("scr-problem");
+    let problem={
+      title:"Learning Without Application",
+      desc:"You gain insight easily, but execution waits for certainty."
+    };
+    problemBox.innerHTML=`
+      <div class="problem">
+        <h3>${problem.title}</h3>
+        <p>${problem.desc}</p>
+        <button onclick="Engine.prepareHandoff('${problem.title}','${problem.desc}')">
+          Work on this
+        </button>
+      </div>`;
+  },
 
-            log: function(msg) {
-                document.getElementById('ai-log').innerText = msg;
-            }
-        };
-    </script>
+  prepareHandoff(title,desc){
+    const prompt=
+`You are HPOS — Human Potential Operating System.
+
+Continue guiding this person.
+Do NOT restart analysis.
+Do NOT motivate.
+Act as a calm, long-term guide.
+
+COGNITIVE MAP:
+Path: ${this.path.toUpperCase()}
+Depth: ${this.brain.depth}
+Action: ${this.brain.action}
+Emotion: ${this.brain.emotion}
+Structure: ${this.brain.structure}
+Avoidance: ${this.brain.avoidance}
+
+PROBLEM:
+${title}
+${desc}
+
+TASK:
+Explain why this problem fits.
+Create a 4-week real-world execution plan.
+Guide week by week until the user says: "goal reached".
+
+Begin now.`;
+
+    this.handoffText=prompt;
+    handoff.innerText=prompt;
+    this.show("scr-continue");
+  },
+
+  openChatGPT(){
+    const url="https://chat.openai.com/?q="+encodeURIComponent(this.handoffText);
+    window.open(url,"_blank");
+  },
+
+  show(id){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    this.screen=id;
+  }
+};
+</script>
 </body>
 </html>
 
