@@ -1,248 +1,304 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HPOS – Human Potential Operating System</title>
+<meta charset="UTF-8">
+<title>HPOS — Human Potential Operating System</title>
 
 <style>
-/* ---------- CORE THEME ---------- */
+/* ================================
+   CORE VISUAL SYSTEM
+================================ */
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: "Segoe UI", system-ui, sans-serif;
-  background: radial-gradient(circle at top, #0b1d2a, #05070d);
-  color: #e8eef3;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: #e5e7eb;
   overflow-x: hidden;
 }
 
-/* ---------- GLOBAL ANIMATIONS ---------- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+h1, h2, h3 {
+  font-weight: 600;
 }
 
-@keyframes glow {
-  0% { box-shadow: 0 0 10px rgba(0,200,255,.2); }
-  100% { box-shadow: 0 0 30px rgba(0,200,255,.6); }
-}
-
-/* ---------- SCREEN SYSTEM ---------- */
 .screen {
   display: none;
   min-height: 100vh;
-  padding: 40px 20px;
-  animation: fadeIn .8s ease;
+  padding: 60px 20px;
 }
 
 .screen.active {
   display: block;
 }
 
-/* ---------- CARD ---------- */
-.card {
-  max-width: 720px;
+.center {
+  max-width: 900px;
   margin: auto;
+}
+
+.card {
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(14px);
-  border-radius: 20px;
-  padding: 35px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  backdrop-filter: blur(20px);
+  transform-style: preserve-3d;
 }
 
-/* ---------- TEXT ---------- */
-h1 {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-}
-
-h2 {
-  font-size: 1.6rem;
-  margin-top: 25px;
-}
-
-p {
-  line-height: 1.7;
-  opacity: 0.95;
-}
-
-/* ---------- BUTTONS ---------- */
 button {
   width: 100%;
   margin-top: 14px;
   padding: 14px;
-  font-size: 1rem;
   border-radius: 10px;
   border: none;
+  font-size: 16px;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: #020617;
   cursor: pointer;
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  color: #fff;
-  transition: transform .2s, box-shadow .2s;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  animation: glow 1s infinite alternate;
+  transform: scale(1.02);
 }
 
-/* ---------- PROGRESS ---------- */
-.progress {
-  height: 6px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 25px;
+.ai {
+  margin-top: 30px;
+  font-style: italic;
+  color: #93c5fd;
 }
 
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg,#00c6ff,#00ffcc);
-  transition: width .4s;
+/* ================================
+   TRANSITIONS
+================================ */
+
+.fade {
+  animation: fadeIn 1s ease;
 }
 
-/* ---------- LIST ---------- */
-ul {
-  padding-left: 18px;
-}
-li {
-  margin-bottom: 10px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
 </head>
 
 <body>
 
-<!-- 1. INTRO -->
-<section class="screen active" id="intro">
-  <div class="card">
-    <h1>HPOS</h1>
-    <p><strong>Human Potential Operating System</strong></p>
-    <p>
-      This is not a website.<br>
-      This is not motivation.<br><br>
-      HPOS is a system that studies how you think, how you react,
-      and how you survive complexity.
-    </p>
-    <p>
-      If you proceed, HPOS will mirror you.
-    </p>
-    <button onclick="next('scan',10)">Begin System Scan</button>
+<!-- =================================
+     SCREEN 1 — BOOT
+================================= -->
+<div class="screen active fade" id="boot">
+  <div class="center">
+    <div class="card">
+      <h1>HPOS</h1>
+      <p>Human Potential Operating System</p>
+      <p>This is not a test.  
+      This is a system that learns how *you* think.</p>
+      <button onclick="nextScreen('questions')">Initialize</button>
+    </div>
   </div>
-</section>
+</div>
 
-<!-- 2. SCAN -->
-<section class="screen" id="scan">
-  <div class="card">
-    <div class="progress"><div class="progress-bar" id="bar"></div></div>
-    <h2>Identity Scan</h2>
-    <p>When a problem appears, your first instinct is:</p>
-    <button onclick="answer('analyze')">Analyze quietly</button>
-    <button onclick="answer('act')">Act immediately</button>
-    <button onclick="answer('avoid')">Avoid until forced</button>
+<!-- =================================
+     SCREEN 2 — QUESTION ENGINE
+================================= -->
+<div class="screen fade" id="questions">
+  <div class="center">
+    <div class="card">
+      <h2 id="qText"></h2>
+      <div id="options"></div>
+      <div class="ai" id="aiVoice"></div>
+    </div>
   </div>
-</section>
+</div>
 
-<!-- 3. COGNITIVE MAP -->
-<section class="screen" id="map">
-  <div class="card">
-    <div class="progress"><div class="progress-bar"></div></div>
-    <h2>Cognitive Mapping</h2>
-    <p>HPOS detected these traits:</p>
-    <ul>
-      <li>System-oriented thinking</li>
-      <li>Low tolerance for inefficiency</li>
-      <li>High internal pressure</li>
-      <li>Delayed self-reward</li>
-    </ul>
-    <button onclick="next('weakness',40)">Continue</button>
+<!-- =================================
+     SCREEN 3 — COGNITIVE SUMMARY
+================================= -->
+<div class="screen fade" id="summary">
+  <div class="center">
+    <div class="card">
+      <h2>Your Cognitive Map</h2>
+      <div id="summaryText"></div>
+      <div class="ai" id="summaryAI"></div>
+      <button onclick="nextScreen('execution')">Enter Life Execution Mode</button>
+    </div>
   </div>
-</section>
+</div>
 
-<!-- 4. WEAKNESS -->
-<section class="screen" id="weakness">
-  <div class="card">
-    <div class="progress"><div class="progress-bar"></div></div>
-    <h2>Hidden Bottleneck</h2>
-    <p>
-      You are not lazy.<br>
-      You are overloaded.
-    </p>
-    <p>
-      Your mind runs faster than your environment.
-      HPOS classifies this as <strong>Execution Friction</strong>.
-    </p>
-    <button onclick="next('strategy',65)">Generate Strategy</button>
+<!-- =================================
+     SCREEN 4 — LIFE EXECUTION ENGINE
+================================= -->
+<div class="screen fade" id="execution">
+  <div class="center">
+    <div class="card">
+      <h2>Life Execution Engine</h2>
+      <p>Your real-world operating instructions:</p>
+      <ul id="executionPlan"></ul>
+      <div class="ai" id="executionAI"></div>
+    </div>
   </div>
-</section>
-
-<!-- 5. STRATEGY -->
-<section class="screen" id="strategy">
-  <div class="card">
-    <div class="progress"><div class="progress-bar"></div></div>
-    <h2>AI Strategy Engine</h2>
-    <p>HPOS recommends:</p>
-    <ul>
-      <li>External structure before motivation</li>
-      <li>Daily cognitive unloading</li>
-      <li>Small visible wins</li>
-    </ul>
-    <button onclick="next('plan',85)">Build 30-Day System</button>
-  </div>
-</section>
-
-<!-- 6. PLAN -->
-<section class="screen" id="plan">
-  <div class="card">
-    <div class="progress"><div class="progress-bar"></div></div>
-    <h2>30-Day Operating Plan</h2>
-    <ul>
-      <li>Week 1: Stabilize routine</li>
-      <li>Week 2: Remove friction</li>
-      <li>Week 3: Skill compounding</li>
-      <li>Week 4: Self-direction</li>
-    </ul>
-    <button onclick="next('final',100)">Finalize System</button>
-  </div>
-</section>
-
-<!-- 7. FINAL -->
-<section class="screen" id="final">
-  <div class="card">
-    <h2>System Activated</h2>
-    <p>
-      HPOS does not end here.<br>
-      This system grows with you.
-    </p>
-    <p>
-      You are no longer reacting.<br>
-      You are operating.
-    </p>
-  </div>
-</section>
+</div>
 
 <script>
-let progress = 0;
+/* ================================
+   GLOBAL SYSTEM STATE
+================================ */
 
-function next(id, p) {
+let currentQuestion = 0;
+
+/* ================================
+   COGNITIVE MODEL ENGINE
+================================ */
+
+const brain = {
+  systemThinking: 0,
+  executionDrive: 0,
+  emotionalLoad: 0,
+  ambiguityTolerance: 0,
+  autonomy: 0,
+  disciplineNeed: 0
+};
+
+/* ================================
+   QUESTION ENGINE (EXTEND TO 500+)
+================================ */
+
+const questions = [
+  {
+    text: "When something fails after serious effort, what hurts you the most?",
+    options: [
+      { text: "Wasted effort", effect: { disciplineNeed: 2 } },
+      { text: "Lost time", effect: { executionDrive: 2 } },
+      { text: "Being misunderstood", effect: { emotionalLoad: 2 } },
+      { text: "Loss of control", effect: { systemThinking: 2 } }
+    ]
+  },
+  {
+    text: "What drains you faster?",
+    options: [
+      { text: "People without logic", effect: { systemThinking: 2 } },
+      { text: "Slow execution", effect: { executionDrive: 2 } },
+      { text: "Unclear expectations", effect: { ambiguityTolerance: -2 } },
+      { text: "Repeating basics", effect: { autonomy: 2 } }
+    ]
+  },
+  {
+    text: "You feel most alive when you are:",
+    options: [
+      { text: "Building systems", effect: { systemThinking: 2 } },
+      { text: "Fixing broken things", effect: { executionDrive: 2 } },
+      { text: "Learning deeply", effect: { autonomy: 2 } },
+      { text: "Working alone", effect: { emotionalLoad: -1 } }
+    ]
+  }
+  // 🔥 ADD 500+ QUESTIONS HERE
+];
+
+/* ================================
+   AI PERSONALITY ENGINE
+================================ */
+
+const aiPersonality = {
+  guide: [
+    "I am observing patterns, not judging you.",
+    "Your answers reveal structure, not labels.",
+    "Clarity reduces effort."
+  ],
+  systemThinker: [
+    "You are uncomfortable with chaos because your mind sees order.",
+    "You think in frameworks, not fragments."
+  ],
+  executor: [
+    "Your frustration comes from delayed action, not lack of ability."
+  ]
+};
+
+function aiSpeak(type) {
+  const pool = aiPersonality[type] || aiPersonality.guide;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* ================================
+   UI LOGIC
+================================ */
+
+function nextScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  progress = p;
-  updateBar();
+  if (id === 'questions') loadQuestion();
 }
 
-function answer(type) {
-  console.log("User type:", type);
-  next('map',25);
-}
+function loadQuestion() {
+  const q = questions[currentQuestion];
+  if (!q) return generateSummary();
 
-function updateBar() {
-  document.querySelectorAll('.progress-bar').forEach(bar => {
-    bar.style.width = progress + "%";
+  document.getElementById('qText').innerText = q.text;
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = "";
+
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.innerText = opt.text;
+    btn.onclick = () => answer(opt.effect);
+    optionsDiv.appendChild(btn);
   });
+
+  document.getElementById('aiVoice').innerText = aiSpeak("guide");
+}
+
+function answer(effect) {
+  Object.keys(effect).forEach(k => brain[k] += effect[k]);
+  currentQuestion++;
+  loadQuestion();
+}
+
+/* ================================
+   SUMMARY ENGINE
+================================ */
+
+function generateSummary() {
+  nextScreen('summary');
+
+  let summary = `
+  <p><b>Thinking Style:</b> ${brain.systemThinking > 3 ? "Architect" : "Adaptive"}</p>
+  <p><b>Execution Pattern:</b> ${brain.executionDrive > 3 ? "High Drive" : "Measured"}</p>
+  <p><b>Emotional Load:</b> ${brain.emotionalLoad}</p>
+  `;
+
+  document.getElementById('summaryText').innerHTML = summary;
+  document.getElementById('summaryAI').innerText = aiSpeak("systemThinker");
+
+  generateExecution();
+}
+
+/* ================================
+   LIFE EXECUTION ENGINE
+================================ */
+
+function generateExecution() {
+  const plan = document.getElementById('executionPlan');
+  plan.innerHTML = "";
+
+  const actions = [
+    "Reduce simultaneous goals to one system",
+    "Translate learning into weekly experiments",
+    "Remove noise before adding effort",
+    "Build structure before speed"
+  ];
+
+  actions.forEach(a => {
+    const li = document.createElement('li');
+    li.innerText = a;
+    plan.appendChild(li);
+  });
+
+  document.getElementById('executionAI').innerText =
+    "Execution begins when clarity is respected.";
 }
 </script>
 
