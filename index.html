@@ -1,122 +1,248 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>HPOS</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #020617, #0f172a);
-      color: #e5e7eb;
-    }
-    .screen {
-      display: none;
-      min-height: 100vh;
-      padding: 40px;
-      box-sizing: border-box;
-    }
-    .active {
-      display: block;
-    }
-    .card {
-      max-width: 500px;
-      margin: auto;
-      background: rgba(255,255,255,0.05);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      transform: perspective(800px) translateZ(0);
-    }
-    button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #22c55e;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HPOS – Human Potential Operating System</title>
+
+<style>
+/* ---------- CORE THEME ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(circle at top, #0b1d2a, #05070d);
+  color: #e8eef3;
+  overflow-x: hidden;
+}
+
+/* ---------- GLOBAL ANIMATIONS ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 10px rgba(0,200,255,.2); }
+  100% { box-shadow: 0 0 30px rgba(0,200,255,.6); }
+}
+
+/* ---------- SCREEN SYSTEM ---------- */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 40px 20px;
+  animation: fadeIn .8s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* ---------- CARD ---------- */
+.card {
+  max-width: 720px;
+  margin: auto;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  padding: 35px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ---------- TEXT ---------- */
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 1.6rem;
+  margin-top: 25px;
+}
+
+p {
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+/* ---------- BUTTONS ---------- */
+button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  transition: transform .2s, box-shadow .2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  animation: glow 1s infinite alternate;
+}
+
+/* ---------- PROGRESS ---------- */
+.progress {
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#00c6ff,#00ffcc);
+  transition: width .4s;
+}
+
+/* ---------- LIST ---------- */
+ul {
+  padding-left: 18px;
+}
+li {
+  margin-bottom: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- 1. WELCOME -->
-<div class="screen active" id="welcome">
+<!-- 1. INTRO -->
+<section class="screen active" id="intro">
   <div class="card">
     <h1>HPOS</h1>
-    <p>Human Potential Operating System</p>
-    <p>This is not a test. It’s a journey.</p>
-    <button onclick="next('questions')">Start</button>
+    <p><strong>Human Potential Operating System</strong></p>
+    <p>
+      This is not a website.<br>
+      This is not motivation.<br><br>
+      HPOS is a system that studies how you think, how you react,
+      and how you survive complexity.
+    </p>
+    <p>
+      If you proceed, HPOS will mirror you.
+    </p>
+    <button onclick="next('scan',10)">Begin System Scan</button>
   </div>
-</div>
+</section>
 
-<!-- 2. QUESTIONS -->
-<div class="screen" id="questions">
+<!-- 2. SCAN -->
+<section class="screen" id="scan">
   <div class="card">
-    <p><b>When something is broken, what do you do first?</b></p>
-    <button onclick="answer()">Understand it</button>
-    <button onclick="answer()">Fix it</button>
-    <button onclick="answer()">Ask someone</button>
+    <div class="progress"><div class="progress-bar" id="bar"></div></div>
+    <h2>Identity Scan</h2>
+    <p>When a problem appears, your first instinct is:</p>
+    <button onclick="answer('analyze')">Analyze quietly</button>
+    <button onclick="answer('act')">Act immediately</button>
+    <button onclick="answer('avoid')">Avoid until forced</button>
   </div>
-</div>
+</section>
 
-<!-- 3. THINKING SUMMARY -->
-<div class="screen" id="summary">
+<!-- 3. COGNITIVE MAP -->
+<section class="screen" id="map">
   <div class="card">
-    <h3>Your Thinking Style</h3>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <h2>Cognitive Mapping</h2>
+    <p>HPOS detected these traits:</p>
     <ul>
-      <li>You prefer understanding systems</li>
-      <li>You like structure over chaos</li>
-      <li>You get irritated by nonsense</li>
+      <li>System-oriented thinking</li>
+      <li>Low tolerance for inefficiency</li>
+      <li>High internal pressure</li>
+      <li>Delayed self-reward</li>
     </ul>
-    <p><small>This is not a label.</small></p>
-    <button onclick="next('problem')">Continue</button>
+    <button onclick="next('weakness',40)">Continue</button>
   </div>
-</div>
+</section>
 
-<!-- 4. PROBLEM -->
-<div class="screen" id="problem">
+<!-- 4. WEAKNESS -->
+<section class="screen" id="weakness">
   <div class="card">
-    <h3>A Problem That Fits You</h3>
-    <p><b>Learning without application</b></p>
-    <p>People learn skills but don’t know how to use them.</p>
-    <button onclick="next('plan')">Accept</button>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <h2>Hidden Bottleneck</h2>
+    <p>
+      You are not lazy.<br>
+      You are overloaded.
+    </p>
+    <p>
+      Your mind runs faster than your environment.
+      HPOS classifies this as <strong>Execution Friction</strong>.
+    </p>
+    <button onclick="next('strategy',65)">Generate Strategy</button>
   </div>
-</div>
+</section>
 
-<!-- 5. PLAN -->
-<div class="screen" id="plan">
+<!-- 5. STRATEGY -->
+<section class="screen" id="strategy">
   <div class="card">
-    <h3>4-Week Plan</h3>
-    <p>Week 1: Observe</p>
-    <p>Week 2: Improve one thing</p>
-    <p>Week 3: Test with people</p>
-    <p>Week 4: Simplify</p>
-    <button onclick="next('next')">Next</button>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <h2>AI Strategy Engine</h2>
+    <p>HPOS recommends:</p>
+    <ul>
+      <li>External structure before motivation</li>
+      <li>Daily cognitive unloading</li>
+      <li>Small visible wins</li>
+    </ul>
+    <button onclick="next('plan',85)">Build 30-Day System</button>
   </div>
-</div>
+</section>
 
-<!-- 6. CHATGPT CONTINUATION -->
-<div class="screen" id="next">
+<!-- 6. PLAN -->
+<section class="screen" id="plan">
   <div class="card">
-    <h3>Next Step</h3>
-    <p>Copy this and paste into ChatGPT to continue.</p>
-    <textarea style="width:100%;height:120px;">
-Problem: Learning without application
-Guide me step by step until solved.
-    </textarea>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <h2>30-Day Operating Plan</h2>
+    <ul>
+      <li>Week 1: Stabilize routine</li>
+      <li>Week 2: Remove friction</li>
+      <li>Week 3: Skill compounding</li>
+      <li>Week 4: Self-direction</li>
+    </ul>
+    <button onclick="next('final',100)">Finalize System</button>
   </div>
-</div>
+</section>
+
+<!-- 7. FINAL -->
+<section class="screen" id="final">
+  <div class="card">
+    <h2>System Activated</h2>
+    <p>
+      HPOS does not end here.<br>
+      This system grows with you.
+    </p>
+    <p>
+      You are no longer reacting.<br>
+      You are operating.
+    </p>
+  </div>
+</section>
 
 <script>
-function next(id) {
+let progress = 0;
+
+function next(id, p) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  progress = p;
+  updateBar();
 }
-function answer() {
-  next('summary');
+
+function answer(type) {
+  console.log("User type:", type);
+  next('map',25);
+}
+
+function updateBar() {
+  document.querySelectorAll('.progress-bar').forEach(bar => {
+    bar.style.width = progress + "%";
+  });
 }
 </script>
 
