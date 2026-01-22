@@ -1,250 +1,311 @@
-# HPOS — Human Potential Operating System
-# Python Core Engine (CLI / Logic Layer)
-# Author: Sai + Ammu
-# Philosophy-first, execution-driven system
 
-import json
-import datetime
-import sys
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPOS — Human Potential Operating System</title>
 
-# -------------------------------
-# AI PERSONALITY ENGINE
-# -------------------------------
+<style>
+:root{
+  --bg:#0a0a0f;
+  --card:#12121a;
+  --border:rgba(255,255,255,.12);
+  --text:#e8e8ec;
+  --muted:#8b8b9e;
+  --accent:#6366f1;
+  --accentGlow:rgba(99,102,241,.2);
+  --font:system-ui,-apple-system,Inter,Segoe UI,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+#app{width:100%;max-width:720px;padding:20px}
+.screen{display:none;opacity:0;transform:translateY(12px);transition:.4s}
+.screen.active{display:block;opacity:1;transform:none}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+h1{font-weight:300;font-size:1.8rem;margin-bottom:12px}
+p{color:var(--muted);line-height:1.6;margin-bottom:20px}
+button{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  text-align:left;
+  border-radius:10px;
+  transition:.2s;
+}
+button:hover{
+  background:rgba(255,255,255,.12);
+  border-color:var(--accent);
+}
+.ai{
+  margin-top:16px;
+  font-style:italic;
+  color:#bdbde6;
+}
+ul{padding-left:20px}
+li{margin-bottom:8px}
+pre{
+  white-space:pre-wrap;
+  font-size:.8rem;
+  background:#000;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #333;
+  color:#9fffd1;
+}
+.progress{
+  position:fixed;
+  top:0;left:0;
+  height:3px;
+  background:var(--accent);
+  transition:.3s;
+}
+</style>
+</head>
 
-class AIPersonality:
-    OBSERVER = [
-        "I’m noticing patterns. No need to rush.",
-        "Your answers are forming a shape.",
-        "Nothing here is random."
-    ]
+<body>
+<div class="progress" id="bar"></div>
 
-    REFLECTOR = [
-        "There’s a consistency in how you respond.",
-        "This tendency appears more than once.",
-        "I see a direction forming."
-    ]
+<div id="app">
 
-    GUIDE = [
-        "Awareness changes leverage.",
-        "We’ll move one step at a time.",
-        "Execution matters more than clarity."
-    ]
+<!-- BOOT -->
+<div id="scr-boot" class="screen active card">
+  <h1>HPOS initialized</h1>
+  <p>
+    This is not a test.<br>
+    This is a system to help you act in the real world.
+  </p>
+  <button onclick="HPOS.start('logic')">LOGIC — I trust structure</button>
+  <button onclick="HPOS.start('emotion')">INTUITION — I trust feeling</button>
+  <button onclick="HPOS.start('action')">EXECUTION — I learn by doing</button>
+</div>
 
-    @staticmethod
-    def speak(stage="observer"):
-        import random
-        if stage == "observer":
-            return random.choice(AIPersonality.OBSERVER)
-        if stage == "reflector":
-            return random.choice(AIPersonality.REFLECTOR)
-        if stage == "guide":
-            return random.choice(AIPersonality.GUIDE)
-        return ""
+<!-- QUESTIONS -->
+<div id="scr-question" class="screen card">
+  <h1 id="qText"></h1>
+  <div id="qOptions"></div>
+  <div class="ai" id="aiLine"></div>
+</div>
 
+<!-- MIRROR -->
+<div id="scr-mirror" class="screen card">
+  <h1>What HPOS sees</h1>
+  <ul id="mirrorList"></ul>
+  <p>Does this feel accurate?</p>
+  <button onclick="HPOS.confirmMirror(true)">Yes</button>
+  <button onclick="HPOS.confirmMirror(false)">Not quite</button>
+</div>
 
-# -------------------------------
-# COGNITIVE MODEL ENGINE
-# -------------------------------
+<!-- PROBLEM -->
+<div id="scr-problem" class="screen card">
+  <h1>Core problem</h1>
+  <p id="problemText"></p>
+  <button onclick="HPOS.showExecution()">Work on this</button>
+</div>
 
-class CognitiveModel:
-    def __init__(self):
-        self.depth = 0
-        self.action = 0
-        self.emotion = 0
-        self.structure = 0
-        self.avoidance = 0
+<!-- EXECUTION -->
+<div id="scr-exec" class="screen card">
+  <h1>Execution plan</h1>
+  <ul id="execList"></ul>
+  <button onclick="HPOS.prepareChatGPT()">Continue with HPOS</button>
+</div>
 
-    def apply_effect(self, effect: dict):
-        for k, v in effect.items():
-            setattr(self, k, getattr(self, k) + v)
+<!-- HANDOFF -->
+<div id="scr-handoff" class="screen card">
+  <h1>HPOS continues with you</h1>
+  <p>
+    The system will now guide you step by step inside ChatGPT.
+  </p>
+  <pre id="handoffText"></pre>
+  <button onclick="HPOS.openChatGPT()">Open ChatGPT</button>
+</div>
 
-    def mirror_insights(self):
-        insights = []
-        if self.depth > self.action:
-            insights.append("You prefer understanding before acting.")
-        if self.action > self.depth:
-            insights.append("You prefer movement over certainty.")
-        if self.avoidance > 1:
-            insights.append("You delay action when clarity feels incomplete.")
-        if self.structure > 1:
-            insights.append("You rely on structure to feel stable.")
-        if self.emotion > 1:
-            insights.append("Emotions influence your decisions.")
-        return insights
+</div>
 
-    def as_dict(self):
-        return {
-            "depth": self.depth,
-            "action": self.action,
-            "emotion": self.emotion,
-            "structure": self.structure,
-            "avoidance": self.avoidance
-        }
+<script>
+const HPOS={
+  path:null,
+  step:0,
+  brain:{
+    depth:0,
+    action:0,
+    emotion:0,
+    structure:0,
+    avoidance:0
+  },
 
+  aiLines:[
+    "I’m noticing patterns.",
+    "No need to rush.",
+    "Clarity forms slowly.",
+    "This isn’t random."
+  ],
 
-# -------------------------------
-# QUESTION ENGINE
-# -------------------------------
+  questions:[
+    {
+      q:"When something breaks, what do you do first?",
+      o:[
+        {t:"Understand why",e:{depth:2}},
+        {t:"Fix immediately",e:{action:2}},
+        {t:"Wait and observe",e:{avoidance:2}},
+        {t:"Ask someone",e:{emotion:1}}
+      ]
+    },
+    {
+      q:"You learn something useful. What usually happens?",
+      o:[
+        {t:"I wait until confident",e:{avoidance:2}},
+        {t:"I try it quickly",e:{action:2}},
+        {t:"I study it deeply",e:{depth:2}},
+        {t:"I move on",e:{emotion:1}}
+      ]
+    },
+    {
+      q:"Too many options make you feel…",
+      o:[
+        {t:"Curious",e:{depth:1}},
+        {t:"Overwhelmed",e:{avoidance:2}},
+        {t:"Need structure",e:{structure:2}},
+        {t:"Detached",e:{emotion:1}}
+      ]
+    }
+  ],
 
-class QuestionEngine:
-    def __init__(self):
-        self.questions = [
-            {
-                "q": "When something breaks, what do you do first?",
-                "options": {
-                    "1": ("Understand why", {"depth": 2}),
-                    "2": ("Fix immediately", {"action": 2}),
-                    "3": ("Wait and observe", {"avoidance": 2}),
-                    "4": ("Ask someone", {"emotion": 1})
-                }
-            },
-            {
-                "q": "You learn a useful skill. What usually happens?",
-                "options": {
-                    "1": ("I wait until confident", {"avoidance": 2}),
-                    "2": ("I try it quickly", {"action": 2}),
-                    "3": ("I study it deeply", {"depth": 2}),
-                    "4": ("I move on", {"emotion": 1})
-                }
-            },
-            {
-                "q": "Too many options make you feel…",
-                "options": {
-                    "1": ("Curious", {"depth": 1}),
-                    "2": ("Overwhelmed", {"avoidance": 2}),
-                    "3": ("Need structure", {"structure": 2}),
-                    "4": ("Detached", {"emotion": 1})
-                }
-            }
-        ]
+  start(p){
+    this.path=p;
+    this.step=0;
+    this.show("scr-question");
+    this.renderQuestion();
+  },
 
-    def run(self, brain: CognitiveModel):
-        history = []
-        print("\nHPOS initialized.")
-        print("This is not a test. Answer honestly.\n")
+  renderQuestion(){
+    const q=this.questions[this.step];
+    qText.innerText=q.q;
+    qOptions.innerHTML="";
+    q.o.forEach(opt=>{
+      const b=document.createElement("button");
+      b.innerText=opt.t;
+      b.onclick=()=>this.answer(opt);
+      qOptions.appendChild(b);
+    });
+    aiLine.innerText=this.aiLines[Math.floor(Math.random()*this.aiLines.length)];
+    bar.style.width=((this.step+1)/this.questions.length)*100+"%";
+  },
 
-        for i, q in enumerate(self.questions, start=1):
-            print(f"Q{i}. {q['q']}")
-            for k, v in q["options"].items():
-                print(f"  {k}. {v[0]}")
-            choice = input("> ").strip()
+  answer(opt){
+    Object.keys(opt.e).forEach(k=>{
+      this.brain[k]+=opt.e[k];
+    });
+    this.step++;
+    if(this.step<this.questions.length){
+      this.renderQuestion();
+    }else{
+      this.showMirror();
+    }
+  },
 
-            if choice not in q["options"]:
-                print("Invalid input. Skipping.\n")
-                continue
+  showMirror(){
+    this.show("scr-mirror");
+    mirrorList.innerHTML="";
+    if(this.brain.depth>this.brain.action)
+      mirrorList.innerHTML+="<li>You prefer understanding before acting.</li>";
+    if(this.brain.avoidance>1)
+      mirrorList.innerHTML+="<li>You delay action when clarity feels missing.</li>";
+    if(this.brain.structure>1)
+      mirrorList.innerHTML+="<li>You rely on structure to stay grounded.</li>";
+    if(this.brain.emotion>1)
+      mirrorList.innerHTML+="<li>Emotions influence your decisions.</li>";
+  },
 
-            answer_text, effect = q["options"][choice]
-            brain.apply_effect(effect)
-            history.append({
-                "question": q["q"],
-                "answer": answer_text
-            })
+  confirmMirror(ok){
+    if(!ok){
+      this.step=0;
+      this.show("scr-question");
+      this.renderQuestion();
+      return;
+    }
+    this.assignProblem();
+  },
 
-            print(AIPersonality.speak("observer"))
-            print()
+  assignProblem(){
+    this.problem={
+      title:"Learning Without Application",
+      desc:"You gain insight easily, but execution waits for certainty."
+    };
+    this.show("scr-problem");
+    problemText.innerText=this.problem.desc;
+  },
 
-        return history
+  showExecution(){
+    this.show("scr-exec");
+    execList.innerHTML="";
+    [
+      "Week 1: Observe where this problem appears.",
+      "Week 2: Change one small behavior.",
+      "Week 3: Test it with real people.",
+      "Week 4: Improve or simplify."
+    ].forEach(t=>{
+      const li=document.createElement("li");
+      li.innerText=t;
+      execList.appendChild(li);
+    });
+  },
 
+  prepareChatGPT(){
+    const text=
+`You are HPOS — Human Potential Operating System.
 
-# -------------------------------
-# PROBLEM ASSIGNMENT ENGINE
-# -------------------------------
+Continue guiding this person.
+Do NOT restart analysis.
+Do NOT motivate.
 
-class ProblemEngine:
-    @staticmethod
-    def assign(brain: CognitiveModel):
-        # Simple causal logic (expandable)
-        if brain.depth > brain.action and brain.avoidance > 1:
-            return {
-                "title": "Learning Without Application",
-                "description": (
-                    "You gain insight easily, but execution waits for certainty. "
-                    "This creates a gap between knowing and doing."
-                )
-            }
+COGNITIVE MAP:
+${JSON.stringify(this.brain,null,2)}
 
-        return {
-            "title": "Unclear Direction",
-            "description": (
-                "Your energy is present, but it isn’t yet aligned to one path."
-            )
-        }
+PROBLEM:
+${this.problem.title}
+${this.problem.desc}
 
+TASK:
+Explain why this fits.
+Create a 4-week execution plan.
+Guide week by week until the user says "goal reached".`;
 
-# -------------------------------
-# LIFE EXECUTION ENGINE
-# -------------------------------
+    handoffText.innerText=text;
+    this.handoff=text;
+    this.show("scr-handoff");
+  },
 
-class ExecutionEngine:
-    @staticmethod
-    def week_plan(problem_title):
-        return [
-            "Week 1: Observe where this problem appears in daily life. Do not fix it.",
-            "Week 2: Change one small behavior related to this problem.",
-            "Week 3: Test your change with real people or real conditions.",
-            "Week 4: Improve what worked or simplify what didn’t."
-        ]
+  openChatGPT(){
+    window.open(
+      "https://chat.openai.com/?q="+encodeURIComponent(this.handoff),
+      "_blank"
+    );
+  },
 
-
-# -------------------------------
-# HPOS SYSTEM CONTROLLER
-# -------------------------------
-
-class HPOS:
-    def __init__(self):
-        self.brain = CognitiveModel()
-        self.questions = QuestionEngine()
-        self.problem = None
-        self.history = []
-        self.start_time = datetime.datetime.now()
-
-    def run(self):
-        self.history = self.questions.run(self.brain)
-
-        print("\n--- MIRROR ---")
-        insights = self.brain.mirror_insights()
-        for i in insights:
-            print("-", i)
-
-        confirm = input("\nDoes this feel accurate? (y/n): ").lower()
-        if confirm != "y":
-            print("HPOS will adapt next time. Session ending.")
-            sys.exit()
-
-        self.problem = ProblemEngine.assign(self.brain)
-
-        print("\n--- CORE PROBLEM ---")
-        print(self.problem["title"])
-        print(self.problem["description"])
-
-        print("\n--- EXECUTION PLAN ---")
-        for step in ExecutionEngine.week_plan(self.problem["title"]):
-            print(step)
-
-        self.export_for_chatgpt()
-
-    def export_for_chatgpt(self):
-        payload = {
-            "system": "HPOS",
-            "timestamp": self.start_time.isoformat(),
-            "cognitive_map": self.brain.as_dict(),
-            "mirror_insights": self.brain.mirror_insights(),
-            "problem": self.problem,
-            "instruction": (
-                "Continue guiding this person step by step. "
-                "Do not restart analysis. Stay until the goal is reached."
-            )
-        }
-
-        print("\n--- CHATGPT HANDOFF DATA ---")
-        print(json.dumps(payload, indent=2))
-
-
-# -------------------------------
-# ENTRY POINT
-# -------------------------------
-
-if __name__ == "__main__":
-    system = HPOS()
-    system.run()
-
+  show(id){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+};
+</script>
+</body>
+</html>
