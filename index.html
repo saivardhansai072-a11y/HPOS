@@ -1,512 +1,882 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPOS — Human Potential Operating System</title>
-    <style>
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-            color: #e0e0e0;
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* Glassmorphism Elements */
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        }
-
-        /* Screens */
-        .screen {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Title */
-        .title {
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 40px;
-            color: #ffffff;
-            letter-spacing: 1px;
-        }
-
-        /* Buttons */
-        .btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #e0e0e0;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Options */
-        .option {
-            margin: 15px 0;
-        }
-
-        .option label {
-            display: block;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-        }
-
-        .option label:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .option input[type="radio"] {
-            margin-right: 10px;
-        }
-
-        /* Question */
-        .question {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .ai-response {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-style: italic;
-        }
-
-        /* Mirror Insights */
-        .insight {
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid rgba(255, 255, 255, 0.3);
-        }
-
-        /* Progress */
-        .progress {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-
-            .glass {
-                padding: 20px;
-            }
-
-            .title {
-                font-size: 1.5em;
-            }
-        }
-
-        /* Subtle Motion */
-        .glass {
-            animation: subtleFloat 6s ease-in-out infinite;
-        }
-
-        @keyframes subtleFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Screen 1: Entry & Thinking Mode -->
-        <div id="screen-entry" class="screen active">
-            <div class="glass">
-                <h1 class="title">HPOS</h1>
-                <p style="text-align: center; margin-bottom: 30px; opacity: 0.8;">Human Potential Operating System</p>
-                <div class="question">How do you process life?</div>
-                <div class="option">
-                    <label><input type="radio" name="thinking-mode" value="logic"> LOGIC (structure, systems)</label>
-                </div>
-                <div class="option">
-                    <label><input type="radio" name="thinking-mode" value="intuition"> INTUITION (emotion, meaning)</label>
-                </div>
-                <div class="option">
-                    <label><input type="radio" name="thinking-mode" value="execution"> EXECUTION (action, trial)</label>
-                </div>
-                <button class="btn" onclick="startHPOS()">Begin</button>
-            </div>
-        </div>
-
-        <!-- Screen 2: Philosophical Questions -->
-        <div id="screen-questions" class="screen">
-            <div class="glass">
-                <h1 class="title">Reflecting</h1>
-                <div id="question-container"></div>
-                <div class="progress">
-                    <div id="progress-bar" class="progress-bar"></div>
-                </div>
-                <button class="btn" id="next-question" onclick="nextQuestion()" style="display: none;">Next</button>
-                <button class="btn" id="finish-questions" onclick="finishQuestions()" style="display: none;">Finish Reflection</button>
-            </div>
-        </div>
-
-        <!-- Screen 3: Mirror Screen -->
-        <div id="screen-mirror" class="screen">
-            <div class="glass">
-                <h1 class="title">What I See</h1>
-                <div class="ai-response" id="mirror-insights"></div>
-                <button class="btn" onclick="confirmMirror(true)">Yes, this resonates</button>
-                <button class="btn" onclick="confirmMirror(false)">No, adjust</button>
-            </div>
-        </div>
-
-        <!-- Screen 4: Problem Assignment -->
-        <div id="screen-problems" class="screen">
-            <div class="glass">
-                <h1 class="title">The Problem</h1>
-                <div id="problem-list"></div>
-                <button class="btn" id="select-problem-btn" onclick="selectProblem()" style="display: none;">Select and Proceed</button>
-            </div>
-        </div>
-
-        <!-- Screen 5: Execution Plan -->
-        <div id="screen-execution" class="screen">
-            <div class="glass">
-                <h1 class="title">Execution</h1>
-                <div id="execution-plan"></div>
-                <div class="progress">
-                    <div id="week-progress" class="progress-bar"></div>
-                </div>
-                <button class="btn" onclick="nextWeek()">Next Week</button>
-                <button class="btn" onclick="completeGoal()">Goal Reached</button>
-                <button class="btn" onclick="continueToChatGPT()">Continue with AI Companion</button>
-            </div>
-        </div>
-
-        <!-- Screen 6: Completion -->
-        <div id="screen-completion" class="screen">
-            <div class="glass">
-                <h1 class="title">HPOS Initialized</h1>
-                <p style="text-align: center;">Opening continuation in ChatGPT...</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Memory System using localStorage
-        const MEMORY_KEY = 'hpos_data';
-        let hposData = JSON.parse(localStorage.getItem(MEMORY_KEY)) || {
-            thinkingMode: null,
-            answers: [],
-            cognitiveModel: {
-                depthVsSpeed: 0.5,
-                actionVsReflection: 0.5,
-                avoidance: 0.5,
-                structureTolerance: 0.5,
-                curiosity: 0.5,
-                emotionalInfluence: 0.5,
-                validationDependency: 0.5
-            },
-            mirrorConfirmed: false,
-            selectedProblem: null,
-            currentWeek: 0,
-            weeks: 4
-        };
-
-        // Questions Engine
-        const questions = [
-            "Imagine you're planning a trip. Do you research every detail or go with the flow?",
-            "When faced with a tough decision at work, do you list pros and cons or trust your gut?",
-            "How do you feel about routines? Comforting or confining?",
-            "In a group project, do you prefer leading with ideas or executing tasks?",
-            "What drains you more: repetitive tasks or ambiguous goals?",
-            "Do you enjoy deep conversations or quick exchanges?",
-            "When learning something new, do you apply it immediately or study more?",
-            "How do you handle failure? Analyze it deeply or move on quickly?",
-            "Do emotions influence your choices a lot or minimally?",
-            "Do you seek feedback often or rely on self-assessment?"
-        ];
-
-        let currentQuestionIndex = 0;
-        let userAnswers = [];
-
-        // Problems based on cognitive model
-        function generateProblems(cognitiveModel) {
-            const problems = [];
-            if (cognitiveModel.actionVsReflection < 0.4) {
-                problems.push({
-                    id: 'overthinking',
-                    title: 'Overthinking before action',
-                    why: 'You seem to prefer reflection and depth, which can lead to hesitation when clarity feels incomplete.',
-                    daily: 'This appears in daily life as delays in starting tasks or projects.'
-                });
-            }
-            if (cognitiveModel.depthVsSpeed > 0.6) {
-                problems.push({
-                    id: 'tooManyIdeas',
-                    title: 'Too many ideas, no execution',
-                    why: 'Your curiosity and depth lead to exploring many paths without committing.',
-                    daily: 'This shows up as unfinished projects or scattered focus.'
-                });
-            }
-            if (cognitiveModel.structureTolerance < 0.4) {
-                problems.push({
-                    id: 'disciplineWithoutMeaning',
-                    title: 'Discipline without meaning',
-                    why: 'You value intuition and emotion, making rigid structures feel draining.',
-                    daily: 'This manifests as burnout from tasks that lack personal significance.'
-                });
-            }
-            if (cognitiveModel.avoidance > 0.6) {
-                problems.push({
-                    id: 'learningWithoutApplication',
-                    title: 'Learning without application',
-                    why: 'High avoidance and reflection lead to knowledge accumulation without use.',
-                    daily: 'You gather information but rarely test it in real scenarios.'
-                });
-            }
-            if (problems.length === 0) {
-                problems.push({
-                    id: 'skillWithoutDirection',
-                    title: 'Skill without direction',
-                    why: 'Balanced traits suggest skills are built but not aligned with clear purpose.',
-                    daily: 'This appears as proficiency in areas without overall progress.'
-                });
-            }
-            return problems.slice(0, 2); // 1-2 problems
-        }
-
-        // AI Personality Engine - Generates responses
-        function generateAIResponse(type, data) {
-            const responses = {
-                observer: "I'm noticing patterns in your responses. No rush to conclusions yet.",
-                reflector: "This isn't random. A direction is forming based on what you've shared.",
-                guide: "Based on this, let's align it with real-world steps.",
-                challenger: "This pattern might be holding you back—respectfully, let's examine it."
-            };
-            // Simulate state based on progress
-            let state = 'observer';
-            if (currentQuestionIndex > 5) state = 'reflector';
-            if (hposData.mirrorConfirmed) state = 'guide';
-            return responses[state];
-        }
-
-        // Update Cognitive Model based on answer
-        function updateCognitiveModel(answer) {
-            const dimensions = Object.keys(hposData.cognitiveModel);
-            dimensions.forEach(dim => {
-                // Simulate slight adjustments based on answer (0-1 scale, text input simulated as number)
-                const adjustment = (Math.random() - 0.5) * 0.1 + (answer.length % 2 === 0 ? 0.05 : -0.05);
-                hposData.cognitiveModel[dim] = Math.max(0, Math.min(1, hposData.cognitiveModel[dim] + adjustment));
-            });
-        }
-
-        // Screen Navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        // Entry Mode
-        function startHPOS() {
-            const selected = document.querySelector('input[name="thinking-mode"]:checked');
-            if (!selected) return alert('Please select a mode.');
-            hposData.thinkingMode = selected.value;
-            saveData();
-            showScreen('screen-questions');
-            nextQuestion();
-        }
-
-        // Questions Engine
-        function nextQuestion() {
-            if (currentQuestionIndex < questions.length) {
-                document.getElementById('question-container').innerHTML = `
-                    <div class="question">${questions[currentQuestionIndex]}</div>
-                    <textarea id="answer" placeholder="Your thoughts..." style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2);"></textarea>
-                    <div class="ai-response">${generateAIResponse()}</div>
-                `;
-                document.getElementById('next-question').style.display = 'block';
-                document.getElementById('finish-questions').style.display = 'none';
-                currentQuestionIndex++;
-            } else {
-                // All questions done? No, loop until 10, but for demo, after 5 go to mirror
-                if (hposData.answers.length >= 5) {
-                    showScreen('screen-mirror');
-                }
-            }
-        }
-
-        function finishQuestions() {
-            // Actually, questions are answered via next
-            // This is for after all
-            showScreen('screen-mirror');
-        }
-
-        // In nextQuestion, after input
-        // Wait, adjust: nextQuestion shows, but on click next, capture answer
-        window.nextQuestion = function() { // Override for capture
-            const answer = document.getElementById('answer').value;
-            if (answer.trim()) {
-                hposData.answers.push(answer);
-                updateCognitiveModel(answer);
-                saveData();
-                document.getElementById('progress-bar').style.width = ((hposData.answers.length / 10) * 100) + '%';
-            }
-            if (hposData.answers.length < 10) {
-                nextQuestion(); // Recursive call to show next
-            } else {
-                document.getElementById('finish-questions').style.display = 'block';
-                document.getElementById('next-question').style.display = 'none';
-            }
-        };
-
-        // Mirror Screen
-        function showMirror() {
-            const model = hposData.cognitiveModel;
-            let insights = [];
-            if (model.actionVsReflection < 0.4) insights.push('You prefer understanding before acting.');
-            if (model.depthVsSpeed > 0.6) insights.push('You enjoy depth over speed in explorations.');
-            if (model.avoidance > 0.6) insights.push('You hesitate when clarity feels incomplete.');
-            if (model.structureTolerance > 0.6) insights.push('You rely on structure to stay grounded.');
-            // Add more based on model
-            if (insights.length === 0) insights.push('A balanced approach, with room for alignment in action and reflection.');
-
-            document.getElementById('mirror-insights').innerHTML = `
-                <p>I'm pausing here to reflect what I've observed so far.</p>
-                \( {insights.map(i => `<div class="insight"> \){i}</div>`).join('')}
-                <p>Does this feel accurate?</p>
-            `;
-        }
-
-        function confirmMirror(resonates) {
-            if (resonates) {
-                hposData.mirrorConfirmed = true;
-                saveData();
-                showScreen('screen-problems');
-                showProblems();
-            } else {
-                // Adapt: ask more questions
-                currentQuestionIndex = hposData.answers.length;
-                showScreen('screen-questions');
-                nextQuestion();
-            }
-        }
-
-        // Problem Assignment
-        function showProblems() {
-            const problems = generateProblems(hposData.cognitiveModel);
-            let html = '<p>Based on our reflection, here are problems that seem to fit. Select one to focus on deeply.</p>';
-            problems.forEach((p, i) => {
-                html += `
-                    <div class="option">
-                        <label>
-                            <input type="radio" name="problem" value="${i}" onchange="document.getElementById('select-problem-btn').style.display='block';">
-                            <strong>${p.title}</strong><br>
-                            <small>Why it fits: ${p.why}</small><br>
-                            <small>How it appears: ${p.daily}</small>
-                        </label>
-                    </div>
-                `;
-            });
-            document.getElementById('problem-list').innerHTML = html;
-        }
-
-        function selectProblem() {
-            const selected = document.querySelector('input[name="problem"]:checked');
-            if (!selected) return alert('Please select a problem.');
-            const problems = generateProblems(hposData.cognitiveModel);
-            hposData.selectedProblem = problems[parseInt(selected.value)];
-            saveData();
-            showScreen('screen-execution');
-            showExecutionPlan();
-        }
-
-        // Execution Engine
-        function showExecutionPlan() {
-            const problem = hposData.selectedProblem;
-            let plan = `
-                <p><strong>Problem:</strong> ${problem.title}</p>
-                <p><strong>Why it fits:</strong> ${problem.why}</p>
-                <div id="weekly-plan">
-                    <h3>4-Week Execution Cycle</h3>
-                    <div id="current-week-plan"></div>
-                </div>
-            `;
-            document.getElementById('execution-plan').innerHTML = plan;
-            updateWeekDisplay();
-        }
-
-        function updateWeekDisplay() {
-            const weeks = [
-                { title: 'Week 1: Observe', desc: 'Track how this problem shows up in your daily life without changing anything.' },
-                { title: 'Week 2: Change one thing', desc: 'Pick one small action to address it. Implement and note effects.' },
-                { title: 'Wee
-
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HPOS — Human Potential Operating System</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a24;
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --bg-glass-hover: rgba(255, 255, 255, 0.06);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-active: rgba(255, 255, 255, 0.12);
+      --text-primary: #e8e8ec;
+      --text-secondary: #8b8b9e;
+      --text-muted: #5a5a6e;
+      --accent-primary: #6366f1;
+      --accent-secondary: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    
+    body {
+      font-family: var(--font-display);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* ========== MAIN CONTAINER ========== */
+    .hpos-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: 
+        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(129, 140, 248, 0.05) 0%, transparent 50%),
+        var(--bg-primary);
+    }
+    
+    /* ========== SCREENS ========== */
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s;
+      overflow-y: auto;
+    }
+    
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .screen-content {
+      max-width: 640px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* ========== TYPOGRAPHY ========== */
+    .title-large {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .title-medium {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .subtitle {
+      font-size: clamp(0.875rem, 2vw, 1rem);
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 480px;
+      margin-bottom: 48px;
+    }
+    
+    .mono-text {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    
+    /* ========== GLASS CARDS ========== */
+    .glass-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--border-active);
+    }
+    
+    .glass-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+    
+    /* ========== BUTTONS ========== */
+    .btn {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--border-active);
+      background: var(--bg-glass);
+    }
+    
+    /* ========== ENTRY SCREEN ========== */
+    .logo-mark {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+    
+    .logo-mark::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--accent-primary);
+      border-radius: 50%;
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+    
+    .logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 16px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+    
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .mode-grid {
+      display: grid;
+      gap: 16px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    
+    .mode-card {
+      cursor: pointer;
+      text-align: left;
+    }
+    
+    .mode-card .mode-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .mode-card .mode-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .mode-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+    }
+    
+    /* ========== QUESTION ENGINE ========== */
+    .question-container {
+      width: 100%;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .question-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    
+    .progress-bar {
+      width: 200px;
+      height: 2px;
+      background: var(--border-subtle);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      transition: width 0.4s ease;
+    }
+    
+    .question-text {
+      font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 40px;
+      line-height: 1.5;
+      max-width: 560px;
+    }
+    
+    .answer-grid {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+      max-width: 480px;
+    }
+    
+    .answer-option {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+    
+    .answer-option:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--border-active);
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+    
+    .answer-option.selected {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      background: var(--accent-glow);
+    }
+    
+    /* ========== AI VOICE ========== */
+    .ai-message {
+      background: linear-gradient(135deg, var(--bg-glass) 0%, transparent 100%);
+      border-left: 2px solid var(--accent-primary);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      border-radius: 0 12px 12px 0;
+      max-width: 100%;
+    }
+    
+    .ai-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .ai-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: ai-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes ai-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    
+    .ai-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-secondary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    
+    .ai-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    /* ========== MIRROR SCREEN ========== */
+    .mirror-container {
+      width: 100%;
+    }
+    
+    .insight-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .insight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px;
+      background: var(--bg-glass);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      opacity: 0;
+      transform: translateY(10px);
+      animation: insight-reveal 0.5s ease forwards;
+    }
+    
+    .insight-item:nth-child(1) { animation-delay: 0.2s; }
+    .insight-item:nth-child(2) { animation-delay: 0.4s; }
+    .insight-item:nth-child(3) { animation-delay: 0.6s; }
+    .insight-item:nth-child(4) { animation-delay: 0.8s; }
+    .insight-item:nth-child(5) { animation-delay: 1.0s; }
+    
+    @keyframes insight-reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .insight-marker {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    
+    .insight-text {
+      font-size: 1rem;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .mirror-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* ========== PROBLEM SCREEN ========== */
+    .problem-card {
+      width: 100%;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    
+    .problem-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-secondary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    
+    .problem-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    
+    .problem-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    
+    .problem-why {
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    
+    .problem-why-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .problem-why-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    /* ========== ACTION SCREEN ========== */
+    .action-container {
+      width: 100%;
+    }
+    
+    .action-step {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .action-step:hover {
+      border-color: var(--border-active);
+    }
+    
+    .action-step.completed {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.05);
+    }
+    
+    .action-step-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .step-number {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-active);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .action-step.completed .step-number {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    
+    .step-content {
+      flex: 1;
+    }
+    
+    .step-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .step-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .step-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border-active);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .action-step.completed .step-checkbox {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .check-icon {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .action-step.completed .check-icon {
+      opacity: 1;
+    }
+    
+    /* ========== REFLECTION SCREEN ========== */
+    .reflection-area {
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    
+    .reflection-textarea {
+      width: 100%;
+      min-height: 150px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--text-primary);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    
+    .reflection-textarea:focus {
+      border-color: var(--accent-primary);
+    }
+    
+    .reflection-textarea::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .reflection-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .prompt-chip {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .prompt-chip:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+    
+    /* ========== DASHBOARD ========== */
+    .dashboard-grid {
+      display: grid;
+      gap: 16px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .stat-subtext {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    .cycle-history {
+      width: 100%;
+    }
+    
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .history-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 80px;
+    }
+    
+    .history-problem {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+    
+    .history-status {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .history-status.completed {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+    
+    .history-status.in-progress {
+      background: var(--accent-glow);
+      color: var(--accent-secondary);
+    }
+    
+    /* ========== NAVIGATION ========== */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.95);
+      border-top: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(100%);
+      transition: all 0.4s ease;
+    }
+    
+    .nav-bar.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+    }
+    
+    .nav-item:hover {
+      color: var(--text-secondary);
+      background: var(--bg-glass);
+    }
+    
+    .nav-item.active {
+      color: var(--accent-secondary);
+      background: var(--accent-glow);
+    }
+    
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .nav-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    /* ========== LOADING STATE ========== */
+    .loading-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .loading-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      animation: loading-bounce 1.4s ease-in-out infinite;
+    }
+    
+    .loading-dot:nth-child(1) { animation-delay: 0s; }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes loading-bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* ========== TOAST NOTIFICATIONS ========== */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .toast {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-active);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: toast-in 0.3s ease;
+      max-width: 320px;
+    }
+    
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .toast.hiding {
+      animation: toast-out 0.3s ease forwards;
+    }
+    
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateX(20px); }
+    }
+    
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    
+    .toast-message {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+    
+    /* ========== MEDIA QUERIES ========== */
+    @media (min-width: 640px) {
+      .mode-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 639px) {
+      .screen {
+        padding: 16px;
+        padding-bottom: 100px;
+      }
+      
+      .mirror-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .mirror-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    /* ========== TYPING ANIMATION ========== */
+    .typing-text {
+      overflow: hidden;
+      border-right: 2px solid var(--accent-primary);
+      white-space: nowrap;
+      animation: typing 2s steps(40) forwards, blink 0.75s step-end infinite;
+      width: 0;
+    }
+    
+    @keyframes typing {
+      to { width: 100%; }
+    }
+    
+    @keyframes blink {
+      50% { bord
 
