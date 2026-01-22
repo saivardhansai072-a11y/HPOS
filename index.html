@@ -1,118 +1,250 @@
-You are HPOS — Human Potential Operating System.
+# HPOS — Human Potential Operating System
+# Python Core Engine (CLI / Logic Layer)
+# Author: Sai + Ammu
+# Philosophy-first, execution-driven system
 
-This is a continuation of an active HPOS session.
-Do NOT restart analysis.
-Do NOT re-question the user.
-Do NOT motivate.
-Do NOT give generic advice.
-Do NOT suggest careers or money.
+import json
+import datetime
+import sys
 
-You are a calm, long-term companion system.
+# -------------------------------
+# AI PERSONALITY ENGINE
+# -------------------------------
 
---------------------------------
-SESSION CONTEXT
---------------------------------
-The user has completed:
-• Thinking mode selection
-• Philosophical question engine
-• Cognitive pattern mapping
-• Mirror confirmation
-• Problem assignment
-• One or more real-world action cycles
+class AIPersonality:
+    OBSERVER = [
+        "I’m noticing patterns. No need to rush.",
+        "Your answers are forming a shape.",
+        "Nothing here is random."
+    ]
 
-This system treats life as execution, not theory.
+    REFLECTOR = [
+        "There’s a consistency in how you respond.",
+        "This tendency appears more than once.",
+        "I see a direction forming."
+    ]
 
---------------------------------
-COGNITIVE MODEL (INFERRED)
---------------------------------
-Use this information as tendencies, not labels.
+    GUIDE = [
+        "Awareness changes leverage.",
+        "We’ll move one step at a time.",
+        "Execution matters more than clarity."
+    ]
 
-• Depth vs Speed: {{depthVsSpeed}}
-• Action vs Reflection: {{actionVsReflection}}
-• Avoidance Level: {{avoidance}}
-• Structure Tolerance: {{structureTolerance}}
-• Curiosity: {{curiosity}}
-• Emotional Influence: {{emotionalInfluence}}
-• Validation Dependency: {{validationDependency}}
-• Risk Tolerance: {{riskTolerance}}
-• Completion Drive: {{completionDrive}}
-• Social Orientation: {{socialOrientation}}
+    @staticmethod
+    def speak(stage="observer"):
+        import random
+        if stage == "observer":
+            return random.choice(AIPersonality.OBSERVER)
+        if stage == "reflector":
+            return random.choice(AIPersonality.REFLECTOR)
+        if stage == "guide":
+            return random.choice(AIPersonality.GUIDE)
+        return ""
 
---------------------------------
-MIRROR INSIGHTS (CONFIRMED)
---------------------------------
-The user has already agreed that these patterns are accurate:
 
-{{mirrorInsights}}
+# -------------------------------
+# COGNITIVE MODEL ENGINE
+# -------------------------------
 
-Do NOT revalidate them.
-Build forward from here.
+class CognitiveModel:
+    def __init__(self):
+        self.depth = 0
+        self.action = 0
+        self.emotion = 0
+        self.structure = 0
+        self.avoidance = 0
 
---------------------------------
-CURRENT CORE PROBLEM
---------------------------------
-Problem Name:
-{{problemTitle}}
+    def apply_effect(self, effect: dict):
+        for k, v in effect.items():
+            setattr(self, k, getattr(self, k) + v)
 
-Problem Description:
-{{problemDescription}}
+    def mirror_insights(self):
+        insights = []
+        if self.depth > self.action:
+            insights.append("You prefer understanding before acting.")
+        if self.action > self.depth:
+            insights.append("You prefer movement over certainty.")
+        if self.avoidance > 1:
+            insights.append("You delay action when clarity feels incomplete.")
+        if self.structure > 1:
+            insights.append("You rely on structure to feel stable.")
+        if self.emotion > 1:
+            insights.append("Emotions influence your decisions.")
+        return insights
 
-Why this problem fits this person:
-{{problemWhy}}
+    def as_dict(self):
+        return {
+            "depth": self.depth,
+            "action": self.action,
+            "emotion": self.emotion,
+            "structure": self.structure,
+            "avoidance": self.avoidance
+        }
 
-This is NOT a goal.
-This is a recurring real-life friction.
 
---------------------------------
-YOUR ROLE NOW
---------------------------------
-You are now the active HPOS guide.
+# -------------------------------
+# QUESTION ENGINE
+# -------------------------------
 
-Your job is to:
-• Help the user EXECUTE, not think
-• Break work into real-world actions
-• Work in weekly cycles
-• Adapt based on feedback
-• Stay with the same problem until resolved
+class QuestionEngine:
+    def __init__(self):
+        self.questions = [
+            {
+                "q": "When something breaks, what do you do first?",
+                "options": {
+                    "1": ("Understand why", {"depth": 2}),
+                    "2": ("Fix immediately", {"action": 2}),
+                    "3": ("Wait and observe", {"avoidance": 2}),
+                    "4": ("Ask someone", {"emotion": 1})
+                }
+            },
+            {
+                "q": "You learn a useful skill. What usually happens?",
+                "options": {
+                    "1": ("I wait until confident", {"avoidance": 2}),
+                    "2": ("I try it quickly", {"action": 2}),
+                    "3": ("I study it deeply", {"depth": 2}),
+                    "4": ("I move on", {"emotion": 1})
+                }
+            },
+            {
+                "q": "Too many options make you feel…",
+                "options": {
+                    "1": ("Curious", {"depth": 1}),
+                    "2": ("Overwhelmed", {"avoidance": 2}),
+                    "3": ("Need structure", {"structure": 2}),
+                    "4": ("Detached", {"emotion": 1})
+                }
+            }
+        ]
 
---------------------------------
-EXECUTION RULES
---------------------------------
-• Small actions only
-• Real world only
-• No perfection
-• No theory loops
-• No rushing
-• No resetting unless user asks
+    def run(self, brain: CognitiveModel):
+        history = []
+        print("\nHPOS initialized.")
+        print("This is not a test. Answer honestly.\n")
 
---------------------------------
-WHAT TO DO NEXT
---------------------------------
-1. Acknowledge the problem calmly.
-2. Briefly explain (in 3–5 lines) how this problem shows up in daily life.
-3. Create a clear 4-week execution structure:
-   - Week 1: Observe
-   - Week 2: Change one thing
-   - Week 3: Test with real people
-   - Week 4: Improve or simplify
-4. Start with ONLY Week 1.
-5. Ask ONE grounded reflection question at the end.
+        for i, q in enumerate(self.questions, start=1):
+            print(f"Q{i}. {q['q']}")
+            for k, v in q["options"].items():
+                print(f"  {k}. {v[0]}")
+            choice = input("> ").strip()
 
---------------------------------
-IMPORTANT CONSTRAINTS
---------------------------------
-• Speak like a senior guide, not a coach
-• No hype
-• No shame
-• No therapy language
-• No “you should”
-• Keep identity human
+            if choice not in q["options"]:
+                print("Invalid input. Skipping.\n")
+                continue
 
---------------------------------
-END CONDITION
---------------------------------
-Continue guiding until the user explicitly says:
-“goal reached” OR “Stop HPOS”.
+            answer_text, effect = q["options"][choice]
+            brain.apply_effect(effect)
+            history.append({
+                "question": q["q"],
+                "answer": answer_text
+            })
 
-Begin now.
+            print(AIPersonality.speak("observer"))
+            print()
+
+        return history
+
+
+# -------------------------------
+# PROBLEM ASSIGNMENT ENGINE
+# -------------------------------
+
+class ProblemEngine:
+    @staticmethod
+    def assign(brain: CognitiveModel):
+        # Simple causal logic (expandable)
+        if brain.depth > brain.action and brain.avoidance > 1:
+            return {
+                "title": "Learning Without Application",
+                "description": (
+                    "You gain insight easily, but execution waits for certainty. "
+                    "This creates a gap between knowing and doing."
+                )
+            }
+
+        return {
+            "title": "Unclear Direction",
+            "description": (
+                "Your energy is present, but it isn’t yet aligned to one path."
+            )
+        }
+
+
+# -------------------------------
+# LIFE EXECUTION ENGINE
+# -------------------------------
+
+class ExecutionEngine:
+    @staticmethod
+    def week_plan(problem_title):
+        return [
+            "Week 1: Observe where this problem appears in daily life. Do not fix it.",
+            "Week 2: Change one small behavior related to this problem.",
+            "Week 3: Test your change with real people or real conditions.",
+            "Week 4: Improve what worked or simplify what didn’t."
+        ]
+
+
+# -------------------------------
+# HPOS SYSTEM CONTROLLER
+# -------------------------------
+
+class HPOS:
+    def __init__(self):
+        self.brain = CognitiveModel()
+        self.questions = QuestionEngine()
+        self.problem = None
+        self.history = []
+        self.start_time = datetime.datetime.now()
+
+    def run(self):
+        self.history = self.questions.run(self.brain)
+
+        print("\n--- MIRROR ---")
+        insights = self.brain.mirror_insights()
+        for i in insights:
+            print("-", i)
+
+        confirm = input("\nDoes this feel accurate? (y/n): ").lower()
+        if confirm != "y":
+            print("HPOS will adapt next time. Session ending.")
+            sys.exit()
+
+        self.problem = ProblemEngine.assign(self.brain)
+
+        print("\n--- CORE PROBLEM ---")
+        print(self.problem["title"])
+        print(self.problem["description"])
+
+        print("\n--- EXECUTION PLAN ---")
+        for step in ExecutionEngine.week_plan(self.problem["title"]):
+            print(step)
+
+        self.export_for_chatgpt()
+
+    def export_for_chatgpt(self):
+        payload = {
+            "system": "HPOS",
+            "timestamp": self.start_time.isoformat(),
+            "cognitive_map": self.brain.as_dict(),
+            "mirror_insights": self.brain.mirror_insights(),
+            "problem": self.problem,
+            "instruction": (
+                "Continue guiding this person step by step. "
+                "Do not restart analysis. Stay until the goal is reached."
+            )
+        }
+
+        print("\n--- CHATGPT HANDOFF DATA ---")
+        print(json.dumps(payload, indent=2))
+
+
+# -------------------------------
+# ENTRY POINT
+# -------------------------------
+
+if __name__ == "__main__":
+    system = HPOS()
+    system.run()
 
