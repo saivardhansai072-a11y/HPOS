@@ -7,76 +7,116 @@
 <title>HPOS — Human Potential Operating System</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+
 :root{
-  --bg:#0a0a0f;
-  --card:#12121a;
-  --border:rgba(255,255,255,.12);
-  --text:#e8e8ec;
-  --muted:#8b8b9e;
-  --accent:#6366f1;
-  --accentGlow:rgba(99,102,241,.2);
-  --font:system-ui,-apple-system,Inter,Segoe UI,sans-serif;
+  --bg1:#0f2027;
+  --bg2:#203a43;
+  --bg3:#2c5364;
+  --card:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.18);
+  --text:#f0f4f8;
+  --muted:#c7d2da;
+  --accent:#7dd3fc;
+  --accentGlow:rgba(125,211,252,.3);
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
+
 body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--font);
+  font-family:'Inter',system-ui;
   min-height:100vh;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.6)),
+    linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+  color:var(--text);
   display:flex;
   justify-content:center;
   align-items:center;
 }
-#app{width:100%;max-width:720px;padding:20px}
-.screen{display:none;opacity:0;transform:translateY(12px);transition:.4s}
-.screen.active{display:block;opacity:1;transform:none}
+
+#app{
+  width:100%;
+  max-width:760px;
+  padding:24px;
+}
+
+.screen{
+  display:none;
+  opacity:0;
+  transform:translateY(16px);
+  transition:.6s ease;
+}
+
+.screen.active{
+  display:block;
+  opacity:1;
+  transform:none;
+}
+
 .card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:16px;
-  padding:32px;
-  box-shadow:0 40px 80px rgba(0,0,0,.6);
+  border-radius:24px;
+  padding:36px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 40px 120px rgba(0,0,0,.6);
 }
-h1{font-weight:300;font-size:1.8rem;margin-bottom:12px}
-p{color:var(--muted);line-height:1.6;margin-bottom:20px}
+
+h1{
+  font-weight:300;
+  font-size:2rem;
+  margin-bottom:12px;
+}
+
+p{
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:20px;
+}
+
 button{
   width:100%;
-  background:rgba(255,255,255,.04);
+  background:transparent;
   border:1px solid var(--border);
   color:var(--text);
-  padding:14px;
+  padding:16px;
   margin-bottom:12px;
+  border-radius:14px;
+  font-size:.95rem;
   cursor:pointer;
+  transition:.3s;
   text-align:left;
-  border-radius:10px;
-  transition:.2s;
 }
+
 button:hover{
   background:rgba(255,255,255,.12);
   border-color:var(--accent);
+  box-shadow:0 0 30px var(--accentGlow);
 }
+
 .ai{
-  margin-top:16px;
+  margin-top:20px;
   font-style:italic;
-  color:#bdbde6;
+  color:#dbeafe;
 }
-ul{padding-left:20px}
-li{margin-bottom:8px}
-pre{
-  white-space:pre-wrap;
-  font-size:.8rem;
-  background:#000;
-  padding:14px;
-  border-radius:10px;
-  border:1px solid #333;
-  color:#9fffd1;
-}
+
+ul{padding-left:18px}
+li{margin-bottom:10px}
+
 .progress{
   position:fixed;
   top:0;left:0;
   height:3px;
-  background:var(--accent);
-  transition:.3s;
+  background:linear-gradient(90deg,#7dd3fc,#38bdf8);
+  transition:.4s;
+}
+
+.footer{
+  margin-top:24px;
+  font-size:.75rem;
+  color:#a5b4fc;
+  text-align:center;
 }
 </style>
 </head>
@@ -87,55 +127,54 @@ pre{
 <div id="app">
 
 <!-- BOOT -->
-<div id="scr-boot" class="screen active card">
-  <h1>HPOS initialized</h1>
+<div id="boot" class="screen active card">
+  <h1>HPOS</h1>
   <p>
-    This is not a test.<br>
-    This is a system to help you act in the real world.
+    This is not productivity.<br>
+    This is not motivation.<br><br>
+    This is a calm system that helps you notice,
+    choose, and act — without force.
   </p>
-  <button onclick="HPOS.start('logic')">LOGIC — I trust structure</button>
-  <button onclick="HPOS.start('emotion')">INTUITION — I trust feeling</button>
-  <button onclick="HPOS.start('action')">EXECUTION — I learn by doing</button>
+  <button onclick="HPOS.start('logic')">I think through structure</button>
+  <button onclick="HPOS.start('emotion')">I feel before deciding</button>
+  <button onclick="HPOS.start('action')">I learn by doing</button>
+  <div class="ai">I’ll walk with you — not push you.</div>
 </div>
 
 <!-- QUESTIONS -->
-<div id="scr-question" class="screen card">
+<div id="question" class="screen card">
   <h1 id="qText"></h1>
   <div id="qOptions"></div>
   <div class="ai" id="aiLine"></div>
 </div>
 
 <!-- MIRROR -->
-<div id="scr-mirror" class="screen card">
-  <h1>What HPOS sees</h1>
+<div id="mirror" class="screen card">
+  <h1>This is what I notice</h1>
   <ul id="mirrorList"></ul>
-  <p>Does this feel accurate?</p>
-  <button onclick="HPOS.confirmMirror(true)">Yes</button>
-  <button onclick="HPOS.confirmMirror(false)">Not quite</button>
+  <p>Does this feel true for you?</p>
+  <button onclick="HPOS.confirm(true)">Yes</button>
+  <button onclick="HPOS.confirm(false)">Not fully</button>
 </div>
 
 <!-- PROBLEM -->
-<div id="scr-problem" class="screen card">
-  <h1>Core problem</h1>
+<div id="problem" class="screen card">
+  <h1>Your central friction</h1>
   <p id="problemText"></p>
-  <button onclick="HPOS.showExecution()">Work on this</button>
+  <button onclick="HPOS.plan()">Work with this</button>
 </div>
 
-<!-- EXECUTION -->
-<div id="scr-exec" class="screen card">
-  <h1>Execution plan</h1>
-  <ul id="execList"></ul>
-  <button onclick="HPOS.prepareChatGPT()">Continue with HPOS</button>
+<!-- PLAN -->
+<div id="plan" class="screen card">
+  <h1>Gentle execution</h1>
+  <ul id="planList"></ul>
+  <div class="ai">
+    We’ll move slowly. Real change doesn’t rush.
+  </div>
 </div>
 
-<!-- HANDOFF -->
-<div id="scr-handoff" class="screen card">
-  <h1>HPOS continues with you</h1>
-  <p>
-    The system will now guide you step by step inside ChatGPT.
-  </p>
-  <pre id="handoffText"></pre>
-  <button onclick="HPOS.openChatGPT()">Open ChatGPT</button>
+<div class="footer">
+  HPOS — built for real life 🌿
 </div>
 
 </div>
@@ -144,59 +183,50 @@ pre{
 const HPOS={
   path:null,
   step:0,
-  brain:{
-    depth:0,
-    action:0,
-    emotion:0,
-    structure:0,
-    avoidance:0
-  },
-
-  aiLines:[
-    "I’m noticing patterns.",
-    "No need to rush.",
-    "Clarity forms slowly.",
-    "This isn’t random."
-  ],
-
+  mind:{depth:0,action:0,avoid:0,emotion:0},
   questions:[
     {
-      q:"When something breaks, what do you do first?",
+      q:"When life feels unclear, you usually…",
       o:[
-        {t:"Understand why",e:{depth:2}},
-        {t:"Fix immediately",e:{action:2}},
-        {t:"Wait and observe",e:{avoidance:2}},
-        {t:"Ask someone",e:{emotion:1}}
+        {t:"Think until it makes sense",e:{depth:2}},
+        {t:"Wait for clarity",e:{avoid:2}},
+        {t:"Act anyway",e:{action:2}},
+        {t:"Feel my way",e:{emotion:2}}
       ]
     },
     {
-      q:"You learn something useful. What usually happens?",
+      q:"You learn something meaningful. Then…",
       o:[
-        {t:"I wait until confident",e:{avoidance:2}},
+        {t:"I store it for later",e:{avoid:2}},
         {t:"I try it quickly",e:{action:2}},
-        {t:"I study it deeply",e:{depth:2}},
-        {t:"I move on",e:{emotion:1}}
+        {t:"I refine it mentally",e:{depth:2}},
+        {t:"I talk about it",e:{emotion:1}}
       ]
     },
     {
-      q:"Too many options make you feel…",
+      q:"What hurts more?",
       o:[
-        {t:"Curious",e:{depth:1}},
-        {t:"Overwhelmed",e:{avoidance:2}},
-        {t:"Need structure",e:{structure:2}},
-        {t:"Detached",e:{emotion:1}}
+        {t:"Acting wrong",e:{avoid:2}},
+        {t:"Staying stuck",e:{action:2}},
+        {t:"Not understanding",e:{depth:2}},
+        {t:"Feeling disconnected",e:{emotion:2}}
       ]
     }
+  ],
+  ai:[
+    "I’m listening carefully.",
+    "No judgement here.",
+    "Patterns take time to surface."
   ],
 
   start(p){
     this.path=p;
     this.step=0;
-    this.show("scr-question");
-    this.renderQuestion();
+    this.show("question");
+    this.render();
   },
 
-  renderQuestion(){
+  render(){
     const q=this.questions[this.step];
     qText.innerText=q.q;
     qOptions.innerHTML="";
@@ -206,99 +236,55 @@ const HPOS={
       b.onclick=()=>this.answer(opt);
       qOptions.appendChild(b);
     });
-    aiLine.innerText=this.aiLines[Math.floor(Math.random()*this.aiLines.length)];
+    aiLine.innerText=this.ai[Math.floor(Math.random()*this.ai.length)];
     bar.style.width=((this.step+1)/this.questions.length)*100+"%";
   },
 
   answer(opt){
-    Object.keys(opt.e).forEach(k=>{
-      this.brain[k]+=opt.e[k];
-    });
+    Object.keys(opt.e).forEach(k=>this.mind[k]+=opt.e[k]);
     this.step++;
-    if(this.step<this.questions.length){
-      this.renderQuestion();
-    }else{
-      this.showMirror();
-    }
+    if(this.step<this.questions.length) this.render();
+    else this.mirror();
   },
 
-  showMirror(){
-    this.show("scr-mirror");
+  mirror(){
+    this.show("mirror");
     mirrorList.innerHTML="";
-    if(this.brain.depth>this.brain.action)
-      mirrorList.innerHTML+="<li>You prefer understanding before acting.</li>";
-    if(this.brain.avoidance>1)
-      mirrorList.innerHTML+="<li>You delay action when clarity feels missing.</li>";
-    if(this.brain.structure>1)
-      mirrorList.innerHTML+="<li>You rely on structure to stay grounded.</li>";
-    if(this.brain.emotion>1)
-      mirrorList.innerHTML+="<li>Emotions influence your decisions.</li>";
+    if(this.mind.depth>this.mind.action)
+      mirrorList.innerHTML+="<li>You seek clarity before movement.</li>";
+    if(this.mind.avoid>1)
+      mirrorList.innerHTML+="<li>You wait until certainty arrives.</li>";
+    if(this.mind.action>1)
+      mirrorList.innerHTML+="<li>You grow through action.</li>";
+    if(this.mind.emotion>1)
+      mirrorList.innerHTML+="<li>Your feelings guide your choices.</li>";
   },
 
-  confirmMirror(ok){
-    if(!ok){
-      this.step=0;
-      this.show("scr-question");
-      this.renderQuestion();
-      return;
-    }
-    this.assignProblem();
+  confirm(ok){
+    if(!ok){ this.step=0; this.show("question"); this.render(); return; }
+    this.problem();
   },
 
-  assignProblem(){
-    this.problem={
-      title:"Learning Without Application",
-      desc:"You gain insight easily, but execution waits for certainty."
-    };
-    this.show("scr-problem");
-    problemText.innerText=this.problem.desc;
+  problem(){
+    this.show("problem");
+    problemText.innerText=
+      "Learning gives you comfort, but action waits for certainty. " +
+      "Your growth pauses at the moment of execution.";
   },
 
-  showExecution(){
-    this.show("scr-exec");
-    execList.innerHTML="";
+  plan(){
+    this.show("plan");
+    planList.innerHTML="";
     [
-      "Week 1: Observe where this problem appears.",
-      "Week 2: Change one small behavior.",
-      "Week 3: Test it with real people.",
-      "Week 4: Improve or simplify."
+      "Week 1: Notice where you delay.",
+      "Week 2: Act once without certainty.",
+      "Week 3: Observe consequences calmly.",
+      "Week 4: Adjust — not judge."
     ].forEach(t=>{
       const li=document.createElement("li");
       li.innerText=t;
-      execList.appendChild(li);
+      planList.appendChild(li);
     });
-  },
-
-  prepareChatGPT(){
-    const text=
-`You are HPOS — Human Potential Operating System.
-
-Continue guiding this person.
-Do NOT restart analysis.
-Do NOT motivate.
-
-COGNITIVE MAP:
-${JSON.stringify(this.brain,null,2)}
-
-PROBLEM:
-${this.problem.title}
-${this.problem.desc}
-
-TASK:
-Explain why this fits.
-Create a 4-week execution plan.
-Guide week by week until the user says "goal reached".`;
-
-    handoffText.innerText=text;
-    this.handoff=text;
-    this.show("scr-handoff");
-  },
-
-  openChatGPT(){
-    window.open(
-      "https://chat.openai.com/?q="+encodeURIComponent(this.handoff),
-      "_blank"
-    );
   },
 
   show(id){
@@ -307,5 +293,6 @@ Guide week by week until the user says "goal reached".`;
   }
 };
 </script>
+
 </body>
 </html>
