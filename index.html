@@ -1,202 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>HPOS – Dynamic Question Engine</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{
-  margin:0;
-  font-family:system-ui,sans-serif;
-  background:#0a0a0f;
-  color:#e8e8ec;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.card{
-  width:420px;
-  background:#12121a;
-  padding:24px;
-  border-radius:12px;
-  box-shadow:0 20px 40px rgba(0,0,0,.5);
-}
-h2{font-weight:400;margin-bottom:16px}
-button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  background:#1a1a24;
-  color:#e8e8ec;
-  border:1px solid #2a2a35;
-  border-radius:8px;
-  cursor:pointer;
-  text-align:left;
-}
-button:hover{background:#2a2a35}
-.small{
-  font-size:12px;
-  color:#8b8b9e;
-  margin-top:12px;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>HPOS – Dynamic Question Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b0b10;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      width: 100%;
+      max-width: 600px;
+      background: #14141d;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.6);
+    }
+    h1 {
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+    p {
+      color: #aaa;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .option {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .option:hover {
+      background: #2a2a40;
+      border-color: #6666ff;
+    }
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+    .progress {
+      height: 4px;
+      background: #2a2a3a;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .bar {
+      height: 100%;
+      background: #6666ff;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
-
 <body>
+
 <div class="card">
-  <h2 id="question"></h2>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <h1 id="question">Loading...</h1>
   <div id="options"></div>
-  <div class="small" id="debug"></div>
+  <div class="footer">HPOS — questions adapt based on your choices</div>
 </div>
 
 <script>
-/* =========================
-   SIMPLE DATABASE (localStorage)
-========================= */
-function saveState(){
-  localStorage.setItem("hpos_state",JSON.stringify(STATE));
+/* ================= QUESTIONS ================= */
+
+const QUESTIONS = [
+  /* Paste your full JSON array here */
+  /* I kept only 6 for demo — ADD ALL YOUR QUESTIONS */
+  {
+    id: 1,
+    question: "When you wake up on a weekend with no plans, what tends to happen?",
+    options: {
+      A: { text: "I jump into a task I've been meaning to do", tag: "action" },
+      B: { text: "I wonder about something new and look into it", tag: "curiosity" },
+      C: { text: "I stay in and keep things low-key", tag: "avoidance" },
+      D: { text: "I see what friends are up to online", tag: "external-validation" }
+    }
+  },
+  {
+    id: 2,
+    question: "Faced with a small daily choice like what to wear, how do you decide?",
+    options: {
+      A: { text: "I pick based on what feels practical", tag: "structure" },
+      B: { text: "I go with whatever sparks my interest", tag: "freedom" },
+      C: { text: "I think back on past choices that worked", tag: "reflection" },
+      D: { text: "I consider what others might think", tag: "external-validation" }
+    }
+  },
+  {
+    id: 3,
+    question: "When a friend suggests trying a new activity, what's your first reaction?",
+    options: {
+      A: { text: "I say yes and get started right away", tag: "action" },
+      B: { text: "I hold back if it seems uncertain", tag: "fear" },
+      C: { text: "I dive in knowing I can handle it", tag: "confidence" },
+      D: { text: "I skip it to stick with what I know", tag: "avoidance" }
+    }
+  },
+  {
+    id: 4,
+    question: "If you fail at something important, what do you do next?",
+    options: {
+      A: { text: "Try again with a new approach", tag: "confidence" },
+      B: { text: "Analyze what went wrong", tag: "reflection" },
+      C: { text: "Avoid similar situations for a while", tag: "avoidance" },
+      D: { text: "Look for reassurance", tag: "external-validation" }
+    }
+  },
+  {
+    id: 5,
+    question: "When learning something new, you prefer to:",
+    options: {
+      A: { text: "Follow a clear sequence", tag: "structure" },
+      B: { text: "Jump in and explore", tag: "curiosity" },
+      C: { text: "Wait until it feels necessary", tag: "avoidance" },
+      D: { text: "See how others learned it", tag: "external-validation" }
+    }
+  },
+  {
+    id: 6,
+    question: "When you feel stuck, what helps most?",
+    options: {
+      A: { text: "Taking immediate action", tag: "action" },
+      B: { text: "Stepping back and thinking", tag: "reflection" },
+      C: { text: "Waiting until pressure builds", tag: "avoidance" },
+      D: { text: "Talking it out with someone", tag: "external-validation" }
+    }
+  }
+];
+
+/* ================= ENGINE ================= */
+
+let asked = new Set();
+let tagScore = {};
+let current = null;
+let step = 0;
+const MAX_STEPS = 10;
+
+function start() {
+  current = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+  render();
 }
 
-function loadState(){
-  const s=localStorage.getItem("hpos_state");
-  return s?JSON.parse(s):null;
+function render() {
+  if (!current || step >= MAX_STEPS) {
+    document.getElementById("question").innerText =
+      "Session complete. You can refresh to explore a different path.";
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("bar").style.width = "100%";
+    return;
+  }
+
+  asked.add(current.id);
+  step++;
+
+  document.getElementById("question").innerText = current.question;
+  document.getElementById("options").innerHTML = "";
+  document.getElementById("bar").style.width = (step / MAX_STEPS) * 100 + "%";
+
+  for (let key in current.options) {
+    const opt = current.options[key];
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerText = opt.text;
+    div.onclick = () => choose(opt.tag);
+    document.getElementById("options").appendChild(div);
+  }
 }
 
-/* =========================
-   INTERNAL STATE
-========================= */
-let STATE={
-  step:0,
-  history:[],
-  signals:{
-    curiosity:0,
-    pressure:0,
-    confusion:0,
-    confidence:0
-  }
-};
+function choose(tag) {
+  tagScore[tag] = (tagScore[tag] || 0) + 1;
+  current = getNextQuestion(tag);
+  render();
+}
 
-const saved=loadState();
-if(saved) STATE=saved;
+function getNextQuestion(tag) {
+  const unused = QUESTIONS.filter(q => !asked.has(q.id));
+  if (unused.length === 0) return null;
 
-/* =========================
-   ROOT QUESTION
-========================= */
-const ROOT={
-  text:"When you think about your future, what feels strongest right now?",
-  options:[
-    {text:"I want to explore many things",effects:{curiosity:2}},
-    {text:"I feel pressure to choose fast",effects:{pressure:2}},
-    {text:"I feel confused",effects:{confusion:2}},
-    {text:"I already have some clarity",effects:{confidence:2}}
-  ]
-};
-
-/* =========================
-   QUESTION GENERATOR
-========================= */
-function generateQuestion(){
-  const s=STATE.signals;
-
-  if(s.confusion>=3){
-    return make(
-      "What usually creates confusion for you?",
-      [
-        {text:"Too many options",effects:{confusion:1}},
-        {text:"Fear of wrong choice",effects:{pressure:1}},
-        {text:"Lack of guidance",effects:{confusion:1}},
-        {text:"Overthinking",effects:{confusion:2}}
-      ]
-    );
-  }
-
-  if(s.pressure>=3){
-    return make(
-      "Where does this pressure mostly come from?",
-      [
-        {text:"Family expectations",effects:{pressure:2}},
-        {text:"Comparing with others",effects:{pressure:1}},
-        {text:"Fear of future",effects:{confusion:1}},
-        {text:"Time running out",effects:{pressure:2}}
-      ]
-    );
-  }
-
-  if(s.curiosity>=3){
-    return make(
-      "What attracts your attention the most?",
-      [
-        {text:"Understanding systems",effects:{curiosity:1}},
-        {text:"Building or creating",effects:{confidence:1}},
-        {text:"Helping people",effects:{confidence:1}},
-        {text:"Learning randomly",effects:{curiosity:1}}
-      ]
-    );
-  }
-
-  if(s.confidence>=3){
-    return make(
-      "What gives you this confidence?",
-      [
-        {text:"Past success",effects:{confidence:1}},
-        {text:"Clear interest",effects:{curiosity:1}},
-        {text:"Skill I have",effects:{confidence:1}},
-        {text:"Feedback from others",effects:{pressure:1}}
-      ]
-    );
-  }
-
-  return make(
-    "How do you usually act when unsure?",
-    [
-      {text:"I wait",effects:{confusion:1}},
-      {text:"I ask someone",effects:{pressure:1}},
-      {text:"I try anyway",effects:{confidence:1}},
-      {text:"I avoid it",effects:{confusion:1}}
-    ]
+  const preferred = unused.filter(q =>
+    Object.values(q.options).some(o => o.tag === tag)
   );
+
+  return preferred.length
+    ? preferred[Math.floor(Math.random() * preferred.length)]
+    : unused[Math.floor(Math.random() * unused.length)];
 }
 
-function make(text,options){
-  return {text,options};
-}
-
-/* =========================
-   RENDER
-========================= */
-function render(q){
-  document.getElementById("question").innerText=q.text;
-  const opt=document.getElementById("options");
-  opt.innerHTML="";
-  q.options.forEach(o=>{
-    const b=document.createElement("button");
-    b.innerText=o.text;
-    b.onclick=()=>answer(o);
-    opt.appendChild(b);
-  });
-  document.getElementById("debug").innerText=
-    "Signals: "+JSON.stringify(STATE.signals);
-}
-
-/* =========================
-   ANSWER HANDLER
-========================= */
-function answer(option){
-  STATE.step++;
-  STATE.history.push(option.text);
-  Object.entries(option.effects).forEach(([k,v])=>{
-    STATE.signals[k]+=v;
-  });
-  saveState();
-  render(generateQuestion());
-}
-
-/* =========================
-   START
-========================= */
-render(STATE.step===0?ROOT:generateQuestion());
+/* ================= START ================= */
+start();
 </script>
+
 </body>
 </html>
