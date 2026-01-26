@@ -1,209 +1,408 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>HPOS – Dynamic Question Engine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0b0b10;
-      color: #eee;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .card {
-      width: 100%;
-      max-width: 600px;
-      background: #14141d;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.6);
-    }
-    h1 {
-      font-weight: 400;
-      margin-bottom: 12px;
-    }
-    p {
-      color: #aaa;
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-    .option {
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
-      padding: 14px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .option:hover {
-      background: #2a2a40;
-      border-color: #6666ff;
-    }
-    .footer {
-      margin-top: 16px;
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-    }
-    .progress {
-      height: 4px;
-      background: #2a2a3a;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-    .bar {
-      height: 100%;
-      background: #6666ff;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Human Potential OS</title>
+<style>
+:root{
+  --bg1:#0b1020;
+  --bg2:#132a3a;
+  --bg3:#1b3b2f;
+  --accent:#7fd1b9;
+  --soft:#b6c7d6;
+  --speed:1;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color:#eef3f8;
+  overflow:hidden;
+}
+body{
+  background:radial-gradient(1200px 800px at 30% 20%,var(--bg2),var(--bg1));
+  transition:background 1.5s ease;
+}
+#app{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.layer{
+  position:absolute;
+  inset:-10%;
+  background:
+    radial-gradient(600px 400px at 20% 30%,rgba(127,209,185,.15),transparent 60%),
+    radial-gradient(800px 500px at 80% 70%,rgba(120,140,255,.12),transparent 65%);
+  animation:drift 40s linear infinite;
+  pointer-events:none;
+}
+@keyframes drift{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-5%,3%,0)}
+}
+.card{
+  position:relative;
+  width:min(720px,90%);
+  padding:48px 40px;
+  border-radius:24px;
+  background:rgba(10,20,35,.65);
+  backdrop-filter:blur(18px);
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.card.fade-out{opacity:0;transform:translateY(20px)}
+.card.fade-in{opacity:1;transform:translateY(0)}
+h1{
+  margin:0 0 24px;
+  font-weight:400;
+  letter-spacing:.4px;
+}
+.question{
+  font-size:1.15rem;
+  line-height:1.6;
+  margin-bottom:32px;
+}
+.options{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+button.option{
+  padding:14px 18px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  color:#eef3f8;
+  text-align:left;
+  font-size:.95rem;
+  cursor:pointer;
+  transition:transform .2s ease, background .4s ease;
+}
+button.option:hover{
+  background:rgba(255,255,255,.1);
+  transform:translateY(-2px);
+}
+.center{text-align:center}
+.footer{
+  position:absolute;
+  bottom:12px;
+  width:100%;
+  text-align:center;
+  font-size:.75rem;
+  color:#aab6c2;
+  opacity:.8;
+}
+.reflect-btn{
+  margin-top:28px;
+  padding:14px 28px;
+  font-size:1rem;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(120deg,#7fd1b9,#8fa8ff);
+  color:#081018;
+  cursor:pointer;
+}
+</style>
 </head>
 <body>
-
-<div class="card">
-  <div class="progress"><div class="bar" id="bar"></div></div>
-  <h1 id="question">Loading...</h1>
-  <div id="options"></div>
-  <div class="footer">HPOS — questions adapt based on your choices</div>
+<div id="app">
+  <div class="layer"></div>
+  <div class="card fade-in" id="card"></div>
+  <div class="footer">
+    Human Potential OS helps people recognize patterns they already live with — using branching questions and perceptual design, not judgment or prediction.
+  </div>
 </div>
 
 <script>
-/* ================= QUESTIONS ================= */
+const roles = ["Student","Job Seeker","Working Professional"];
 
-const QUESTIONS = [
-  /* Paste your full JSON array here */
-  /* I kept only 6 for demo — ADD ALL YOUR QUESTIONS */
-  {
-    id: 1,
-    question: "When you wake up on a weekend with no plans, what tends to happen?",
-    options: {
-      A: { text: "I jump into a task I've been meaning to do", tag: "action" },
-      B: { text: "I wonder about something new and look into it", tag: "curiosity" },
-      C: { text: "I stay in and keep things low-key", tag: "avoidance" },
-      D: { text: "I see what friends are up to online", tag: "external-validation" }
-    }
-  },
-  {
-    id: 2,
-    question: "Faced with a small daily choice like what to wear, how do you decide?",
-    options: {
-      A: { text: "I pick based on what feels practical", tag: "structure" },
-      B: { text: "I go with whatever sparks my interest", tag: "freedom" },
-      C: { text: "I think back on past choices that worked", tag: "reflection" },
-      D: { text: "I consider what others might think", tag: "external-validation" }
-    }
-  },
-  {
-    id: 3,
-    question: "When a friend suggests trying a new activity, what's your first reaction?",
-    options: {
-      A: { text: "I say yes and get started right away", tag: "action" },
-      B: { text: "I hold back if it seems uncertain", tag: "fear" },
-      C: { text: "I dive in knowing I can handle it", tag: "confidence" },
-      D: { text: "I skip it to stick with what I know", tag: "avoidance" }
-    }
-  },
-  {
-    id: 4,
-    question: "If you fail at something important, what do you do next?",
-    options: {
-      A: { text: "Try again with a new approach", tag: "confidence" },
-      B: { text: "Analyze what went wrong", tag: "reflection" },
-      C: { text: "Avoid similar situations for a while", tag: "avoidance" },
-      D: { text: "Look for reassurance", tag: "external-validation" }
-    }
-  },
-  {
-    id: 5,
-    question: "When learning something new, you prefer to:",
-    options: {
-      A: { text: "Follow a clear sequence", tag: "structure" },
-      B: { text: "Jump in and explore", tag: "curiosity" },
-      C: { text: "Wait until it feels necessary", tag: "avoidance" },
-      D: { text: "See how others learned it", tag: "external-validation" }
-    }
-  },
-  {
-    id: 6,
-    question: "When you feel stuck, what helps most?",
-    options: {
-      A: { text: "Taking immediate action", tag: "action" },
-      B: { text: "Stepping back and thinking", tag: "reflection" },
-      C: { text: "Waiting until pressure builds", tag: "avoidance" },
-      D: { text: "Talking it out with someone", tag: "external-validation" }
-    }
+const pools = {
+Student:[
+"When a new semester opens, what draws your attention first?",
+"When instructions feel unclear, what do you notice yourself doing?",
+"During a quiet evening, your mind drifts toward what?",
+"When a topic feels difficult, your first instinct is to?",
+"In group work, you naturally find yourself?",
+"When time feels limited, you tend to?",
+"If a concept challenges your beliefs, you usually?",
+"When feedback arrives unexpectedly, you?",
+"Faced with many resources, you choose by?",
+"When others seem ahead, you often?",
+"At the start of a project, you prefer?",
+"When learning feels slow, you respond by?",
+"An unplanned free day feels like?",
+"When expectations are high, you?",
+"If rules are flexible, you?",
+"When curiosity pulls you away, you?",
+"If guidance is absent, you?",
+"When others ask for help, you?",
+"Facing repetition, you?",
+"When progress is subtle, you?",
+"When choosing electives, you?",
+"Silence during study feels?",
+"When plans change suddenly, you?",
+"When effort isn’t visible, you?",
+"With too many ideas, you?",
+"When competition appears, you?",
+"If motivation dips, you?",
+"Structure in learning feels?",
+"When others disagree, you?",
+"At the end of a day, you reflect on?",
+"Ambiguity in goals feels?",
+"When a method fails, you?",
+"When praised publicly, you?",
+"Long-term goals feel?",
+"When pressure builds, you?",
+"Learning alone feels?",
+"Unexpected opportunity appears, you?",
+"When routine sets in, you?",
+"Feedback that conflicts feels?",
+"Your pace compared to others?",
+"When success feels distant, you?",
+"If you could redesign learning, you?",
+"Moments of boredom lead you to?",
+"When curiosity spikes, you?",
+"When clarity arrives, you?",
+"Being watched while learning feels?",
+"When unsure, you look toward?",
+"Your attention is most alive when?",
+"Unfinished tasks make you feel?",
+"When choosing where to start, you?",
+"Deadlines approaching feel?",
+"When learning becomes playful, you?",
+"Conflicting advice makes you?",
+"Energy during study comes from?",
+"When effort goes unnoticed, you?",
+"Future paths feel like?",
+"Stillness during learning feels?",
+"Your learning space matters because?"
+],
+JobSeeker:[
+"When searching for roles, you first focus on?",
+"An unanswered application leaves you feeling?",
+"When advice conflicts, you usually?",
+"Your energy peaks when you?",
+"Waiting periods feel like?",
+"When updating your profile, you?",
+"Rejections tend to make you?",
+"When options seem many, you?",
+"Networking events feel?",
+"Skill gaps make you?",
+"When routine sets in, you?",
+"If feedback is vague, you?",
+"Time between interviews feels?",
+"When confidence wavers, you?",
+"Advice from others feels?",
+"Preparing for interviews, you?",
+"When motivation drops, you?",
+"Comparing yourself to peers, you?",
+"Silence from recruiters feels?",
+"When opportunities appear suddenly, you?",
+"Learning new skills feels?",
+"If a role excites but scares you, you?",
+"Uncertainty about direction feels?",
+"When effort isn’t rewarded, you?",
+"Your resume feels like?",
+"Waiting for results, you?",
+"When asked about goals, you?",
+"Pressure from others feels?",
+"Free time during search feels?",
+"When advice is abundant, you?",
+"Small wins make you?",
+"If plans shift, you?",
+"Preparing answers feels?",
+"When confidence rises, you?",
+"Long searches feel?",
+"Structure in your day feels?",
+"When feedback is positive, you?",
+"Moments of doubt lead you to?",
+"When guidance is absent, you?",
+"Opportunities that stretch you feel?",
+"Routine applications feel?",
+"When hope flickers, you?",
+"Your search environment matters because?",
+"When others succeed, you?",
+"Ambiguous roles feel?",
+"Learning from rejection feels?",
+"When clarity emerges, you?",
+"Social expectations feel?",
+"Quiet mornings feel?",
+"When skills grow slowly, you?",
+"Choosing where to apply, you?",
+"Waiting rooms feel?",
+"When direction feels unclear, you?",
+"External pressure makes you?",
+"Inner motivation comes from?",
+"End of the day reflection is on?",
+"Stillness during the search feels?"
+],
+WorkingProfessional:[
+"At the start of a workday, you focus on?",
+"When priorities conflict, you?",
+"Meetings feel most useful when?",
+"Feedback from peers feels?",
+"When workload increases, you?",
+"Autonomy at work feels?",
+"Learning new tools feels?",
+"When recognition is absent, you?",
+"Team dynamics draw you toward?",
+"Routine tasks make you?",
+"When uncertainty appears, you?",
+"Long-term career thoughts feel?",
+"When ideas differ, you?",
+"Quiet moments at work feel?",
+"Deadlines approaching make you?",
+"When responsibility grows, you?",
+"Mentorship feels like?",
+"When change is announced, you?",
+"Your energy dips when?",
+"Pressure from leadership feels?",
+"Creative freedom feels?",
+"When effort is unseen, you?",
+"Balancing work and life feels?",
+"Unexpected challenges make you?",
+"When collaboration slows, you?",
+"Feedback loops feel?",
+"When learning plateaus, you?",
+"Your pace compared to others?",
+"Workplace silence feels?",
+"When decisions are rushed, you?",
+"Ambiguous instructions make you?",
+"When goals align, you?",
+"Routine weeks feel?",
+"When growth feels slow, you?",
+"Recognition from peers feels?",
+"When expectations rise, you?",
+"Time for reflection feels?",
+"Cross-team work feels?",
+"When plans change, you?",
+"Autonomy increases, you?",
+"Moments of boredom lead you to?",
+"When leadership is unclear, you?",
+"Work identity feels?",
+"When stress accumulates, you?",
+"Learning outside work feels?",
+"Feedback that surprises you feels?",
+"When your role shifts, you?",
+"Quiet success feels?",
+"When support is missing, you?",
+"Future possibilities feel?",
+"Stability at work feels?",
+"When curiosity appears, you?",
+"End-of-day reflection focuses on?",
+"Stillness during work feels?"
+]
+};
+
+let role=null;
+let asked=0;
+let used=new Set();
+let state={pace:0,curiosity:0,orientation:0};
+const card=document.getElementById("card");
+
+function entry(){
+  card.innerHTML=`
+    <h1 class="center">Who are you right now?</h1>
+    <div class="options">
+      ${roles.map(r=>`<button class="option center">${r}</button>`).join("")}
+    </div>
+  `;
+  [...card.querySelectorAll("button")].forEach(btn=>{
+    btn.onclick=()=>{
+      role=btn.textContent;
+      next();
+    };
+  });
+}
+entry();
+
+function next(){
+  if(asked===12){final();return;}
+  card.classList.add("fade-out");
+  setTimeout(()=>{
+    card.classList.remove("fade-out");
+    card.classList.add("fade-in");
+    renderQuestion();
+  },300+Math.random()*400);
+}
+
+function renderQuestion(){
+  const pool=pools[role];
+  let q;
+  do{
+    q=pool[Math.floor(Math.random()*pool.length)];
+  }while(used.has(q));
+  used.add(q);
+  asked++;
+
+  card.innerHTML=`
+    <div class="question">${q}</div>
+    <div class="options">
+      <button class="option">Pause, organize, and decide a clear next step.</button>
+      <button class="option">Explore possibilities and see what unfolds.</button>
+      <button class="option">Choose a safer path that reduces risk.</button>
+      <button class="option">Consider how others might view the choice.</button>
+    </div>
+  `;
+  [...card.querySelectorAll("button")].forEach((btn,i)=>{
+    btn.onclick=()=>{
+      if(i===0){state.pace++;state.curiosity--;state.orientation--;}
+      if(i===1){state.curiosity++;state.pace--;}
+      if(i===2){state.pace--;state.orientation--;}
+      if(i===3){state.orientation++;}
+
+      adaptUI(i);
+      next();
+    };
+  });
+}
+
+function adaptUI(i){
+  if(i===0){
+    document.body.style.background=
+      "radial-gradient(1200px 800px at 40% 20%,#132a3a,#0b1020)";
   }
-];
-
-/* ================= ENGINE ================= */
-
-let asked = new Set();
-let tagScore = {};
-let current = null;
-let step = 0;
-const MAX_STEPS = 10;
-
-function start() {
-  current = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
-  render();
-}
-
-function render() {
-  if (!current || step >= MAX_STEPS) {
-    document.getElementById("question").innerText =
-      "Session complete. You can refresh to explore a different path.";
-    document.getElementById("options").innerHTML = "";
-    document.getElementById("bar").style.width = "100%";
-    return;
+  if(i===1){
+    document.body.style.background=
+      "radial-gradient(1200px 800px at 60% 30%,#1b3b2f,#0b1020)";
   }
-
-  asked.add(current.id);
-  step++;
-
-  document.getElementById("question").innerText = current.question;
-  document.getElementById("options").innerHTML = "";
-  document.getElementById("bar").style.width = (step / MAX_STEPS) * 100 + "%";
-
-  for (let key in current.options) {
-    const opt = current.options[key];
-    const div = document.createElement("div");
-    div.className = "option";
-    div.innerText = opt.text;
-    div.onclick = () => choose(opt.tag);
-    document.getElementById("options").appendChild(div);
+  if(i===2){
+    document.body.style.background=
+      "radial-gradient(1200px 800px at 30% 40%,#101828,#0b1020)";
+  }
+  if(i===3){
+    document.body.style.background=
+      "radial-gradient(1200px 800px at 70% 50%,#2a2f45,#0b1020)";
   }
 }
 
-function choose(tag) {
-  tagScore[tag] = (tagScore[tag] || 0) + 1;
-  current = getNextQuestion(tag);
-  render();
+function final(){
+  card.classList.add("fade-out");
+  setTimeout(()=>{
+    card.innerHTML=`
+      <div class="center">
+        <div style="font-size:1.2rem;line-height:1.7;margin-bottom:24px;">
+          You didn’t answer questions.<br/>You revealed a direction.
+        </div>
+        <button class="reflect-btn">Reflect with ChatGPT</button>
+      </div>
+    `;
+    card.classList.remove("fade-out");
+    card.querySelector("button").onclick=()=>{
+      const prompt=encodeURIComponent(
+        "Based on my responses to 12 branching questions, help me understand my current mindset, decision patterns, strengths, blind spots, and possible growth directions — gently, without labels or judgment."
+      );
+      window.location.href="https://chat.openai.com/?prompt="+prompt;
+    };
+  },800);
 }
-
-function getNextQuestion(tag) {
-  const unused = QUESTIONS.filter(q => !asked.has(q.id));
-  if (unused.length === 0) return null;
-
-  const preferred = unused.filter(q =>
-    Object.values(q.options).some(o => o.tag === tag)
-  );
-
-  return preferred.length
-    ? preferred[Math.floor(Math.random() * preferred.length)]
-    : unused[Math.floor(Math.random() * unused.length)];
-}
-
-/* ================= START ================= */
-start();
 </script>
-
 </body>
 </html>
