@@ -1,408 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Human Potential OS</title>
-<style>
-:root{
-  --bg1:#0b1020;
-  --bg2:#132a3a;
-  --bg3:#1b3b2f;
-  --accent:#7fd1b9;
-  --soft:#b6c7d6;
-  --speed:1;
-}
-*{box-sizing:border-box}
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  color:#eef3f8;
-  overflow:hidden;
-}
-body{
-  background:radial-gradient(1200px 800px at 30% 20%,var(--bg2),var(--bg1));
-  transition:background 1.5s ease;
-}
-#app{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.layer{
-  position:absolute;
-  inset:-10%;
-  background:
-    radial-gradient(600px 400px at 20% 30%,rgba(127,209,185,.15),transparent 60%),
-    radial-gradient(800px 500px at 80% 70%,rgba(120,140,255,.12),transparent 65%);
-  animation:drift 40s linear infinite;
-  pointer-events:none;
-}
-@keyframes drift{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-5%,3%,0)}
-}
-.card{
-  position:relative;
-  width:min(720px,90%);
-  padding:48px 40px;
-  border-radius:24px;
-  background:rgba(10,20,35,.65);
-  backdrop-filter:blur(18px);
-  box-shadow:0 30px 80px rgba(0,0,0,.35);
-  transition:opacity .6s ease, transform .6s ease;
-}
-.card.fade-out{opacity:0;transform:translateY(20px)}
-.card.fade-in{opacity:1;transform:translateY(0)}
-h1{
-  margin:0 0 24px;
-  font-weight:400;
-  letter-spacing:.4px;
-}
-.question{
-  font-size:1.15rem;
-  line-height:1.6;
-  margin-bottom:32px;
-}
-.options{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:14px;
-}
-button.option{
-  padding:14px 18px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.04);
-  color:#eef3f8;
-  text-align:left;
-  font-size:.95rem;
-  cursor:pointer;
-  transition:transform .2s ease, background .4s ease;
-}
-button.option:hover{
-  background:rgba(255,255,255,.1);
-  transform:translateY(-2px);
-}
-.center{text-align:center}
-.footer{
-  position:absolute;
-  bottom:12px;
-  width:100%;
-  text-align:center;
-  font-size:.75rem;
-  color:#aab6c2;
-  opacity:.8;
-}
-.reflect-btn{
-  margin-top:28px;
-  padding:14px 28px;
-  font-size:1rem;
-  border-radius:999px;
-  border:none;
-  background:linear-gradient(120deg,#7fd1b9,#8fa8ff);
-  color:#081018;
-  cursor:pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonar Glasses – A New Vision for the Blind</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --section-bg: #f9fafb;
+            --accent-color: #3b82f6;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header, section, footer {
+            padding: 60px 0;
+        }
+
+        section:nth-child(even) {
+            background-color: var(--section-bg);
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        h1 { font-size: 2.5rem; color: var(--primary-color); }
+        h2 { font-size: 1.8rem; border-bottom: 2px solid var(--primary-color); display: inline-block; margin-bottom: 30px; }
+
+        p { margin-bottom: 15px; }
+
+        ul {
+            list-style-position: inside;
+            margin-bottom: 20px;
+        }
+
+        li { margin-bottom: 10px; }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            background: linear-gradient(to bottom, #eff6ff, #ffffff);
+            padding: 80px 20px;
+        }
+        .hero h1 { margin-bottom: 10px; }
+        .hero .subtitle { font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 20px; }
+        .hero .purpose { font-style: italic; color: #6b7280; max-width: 600px; margin: 0 auto; }
+
+        /* Demo Section */
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            border-radius: 12px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .video-placeholder i { font-size: 3rem; opacity: 0.5; }
+
+        /* FAQ Section */
+        .faq-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+        .faq-question {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+        .faq-item.active .faq-answer {
+            padding: 0 20px 15px 20px;
+            max-height: 200px;
+        }
+        .faq-question::after {
+            content: '+';
+            font-size: 1.2rem;
+        }
+        .faq-item.active .faq-question::after {
+            content: '-';
+        }
+
+        /* Scanner Button */
+        .scanner-container {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: #eff6ff;
+            border-radius: 16px;
+            border: 2px dashed var(--primary-color);
+        }
+        .scanner-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .scanner-btn:hover {
+            background-color: #1e40af;
+            transform: scale(1.05);
+        }
+        .scanner-note {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-bottom: 40px;
+        }
+        .footer-text { font-weight: 600; color: #374151; margin-bottom: 5px; }
+        .team-name { color: #6b7280; font-size: 0.9rem; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .hero { padding: 60px 20px; }
+        }
+    </style>
 </head>
 <body>
-<div id="app">
-  <div class="layer"></div>
-  <div class="card fade-in" id="card"></div>
-  <div class="footer">
-    Human Potential OS helps people recognize patterns they already live with — using branching questions and perceptual design, not judgment or prediction.
-  </div>
-</div>
 
-<script>
-const roles = ["Student","Job Seeker","Working Professional"];
-
-const pools = {
-Student:[
-"When a new semester opens, what draws your attention first?",
-"When instructions feel unclear, what do you notice yourself doing?",
-"During a quiet evening, your mind drifts toward what?",
-"When a topic feels difficult, your first instinct is to?",
-"In group work, you naturally find yourself?",
-"When time feels limited, you tend to?",
-"If a concept challenges your beliefs, you usually?",
-"When feedback arrives unexpectedly, you?",
-"Faced with many resources, you choose by?",
-"When others seem ahead, you often?",
-"At the start of a project, you prefer?",
-"When learning feels slow, you respond by?",
-"An unplanned free day feels like?",
-"When expectations are high, you?",
-"If rules are flexible, you?",
-"When curiosity pulls you away, you?",
-"If guidance is absent, you?",
-"When others ask for help, you?",
-"Facing repetition, you?",
-"When progress is subtle, you?",
-"When choosing electives, you?",
-"Silence during study feels?",
-"When plans change suddenly, you?",
-"When effort isn’t visible, you?",
-"With too many ideas, you?",
-"When competition appears, you?",
-"If motivation dips, you?",
-"Structure in learning feels?",
-"When others disagree, you?",
-"At the end of a day, you reflect on?",
-"Ambiguity in goals feels?",
-"When a method fails, you?",
-"When praised publicly, you?",
-"Long-term goals feel?",
-"When pressure builds, you?",
-"Learning alone feels?",
-"Unexpected opportunity appears, you?",
-"When routine sets in, you?",
-"Feedback that conflicts feels?",
-"Your pace compared to others?",
-"When success feels distant, you?",
-"If you could redesign learning, you?",
-"Moments of boredom lead you to?",
-"When curiosity spikes, you?",
-"When clarity arrives, you?",
-"Being watched while learning feels?",
-"When unsure, you look toward?",
-"Your attention is most alive when?",
-"Unfinished tasks make you feel?",
-"When choosing where to start, you?",
-"Deadlines approaching feel?",
-"When learning becomes playful, you?",
-"Conflicting advice makes you?",
-"Energy during study comes from?",
-"When effort goes unnoticed, you?",
-"Future paths feel like?",
-"Stillness during learning feels?",
-"Your learning space matters because?"
-],
-JobSeeker:[
-"When searching for roles, you first focus on?",
-"An unanswered application leaves you feeling?",
-"When advice conflicts, you usually?",
-"Your energy peaks when you?",
-"Waiting periods feel like?",
-"When updating your profile, you?",
-"Rejections tend to make you?",
-"When options seem many, you?",
-"Networking events feel?",
-"Skill gaps make you?",
-"When routine sets in, you?",
-"If feedback is vague, you?",
-"Time between interviews feels?",
-"When confidence wavers, you?",
-"Advice from others feels?",
-"Preparing for interviews, you?",
-"When motivation drops, you?",
-"Comparing yourself to peers, you?",
-"Silence from recruiters feels?",
-"When opportunities appear suddenly, you?",
-"Learning new skills feels?",
-"If a role excites but scares you, you?",
-"Uncertainty about direction feels?",
-"When effort isn’t rewarded, you?",
-"Your resume feels like?",
-"Waiting for results, you?",
-"When asked about goals, you?",
-"Pressure from others feels?",
-"Free time during search feels?",
-"When advice is abundant, you?",
-"Small wins make you?",
-"If plans shift, you?",
-"Preparing answers feels?",
-"When confidence rises, you?",
-"Long searches feel?",
-"Structure in your day feels?",
-"When feedback is positive, you?",
-"Moments of doubt lead you to?",
-"When guidance is absent, you?",
-"Opportunities that stretch you feel?",
-"Routine applications feel?",
-"When hope flickers, you?",
-"Your search environment matters because?",
-"When others succeed, you?",
-"Ambiguous roles feel?",
-"Learning from rejection feels?",
-"When clarity emerges, you?",
-"Social expectations feel?",
-"Quiet mornings feel?",
-"When skills grow slowly, you?",
-"Choosing where to apply, you?",
-"Waiting rooms feel?",
-"When direction feels unclear, you?",
-"External pressure makes you?",
-"Inner motivation comes from?",
-"End of the day reflection is on?",
-"Stillness during the search feels?"
-],
-WorkingProfessional:[
-"At the start of a workday, you focus on?",
-"When priorities conflict, you?",
-"Meetings feel most useful when?",
-"Feedback from peers feels?",
-"When workload increases, you?",
-"Autonomy at work feels?",
-"Learning new tools feels?",
-"When recognition is absent, you?",
-"Team dynamics draw you toward?",
-"Routine tasks make you?",
-"When uncertainty appears, you?",
-"Long-term career thoughts feel?",
-"When ideas differ, you?",
-"Quiet moments at work feel?",
-"Deadlines approaching make you?",
-"When responsibility grows, you?",
-"Mentorship feels like?",
-"When change is announced, you?",
-"Your energy dips when?",
-"Pressure from leadership feels?",
-"Creative freedom feels?",
-"When effort is unseen, you?",
-"Balancing work and life feels?",
-"Unexpected challenges make you?",
-"When collaboration slows, you?",
-"Feedback loops feel?",
-"When learning plateaus, you?",
-"Your pace compared to others?",
-"Workplace silence feels?",
-"When decisions are rushed, you?",
-"Ambiguous instructions make you?",
-"When goals align, you?",
-"Routine weeks feel?",
-"When growth feels slow, you?",
-"Recognition from peers feels?",
-"When expectations rise, you?",
-"Time for reflection feels?",
-"Cross-team work feels?",
-"When plans change, you?",
-"Autonomy increases, you?",
-"Moments of boredom lead you to?",
-"When leadership is unclear, you?",
-"Work identity feels?",
-"When stress accumulates, you?",
-"Learning outside work feels?",
-"Feedback that surprises you feels?",
-"When your role shifts, you?",
-"Quiet success feels?",
-"When support is missing, you?",
-"Future possibilities feel?",
-"Stability at work feels?",
-"When curiosity appears, you?",
-"End-of-day reflection focuses on?",
-"Stillness during work feels?"
-]
-};
-
-let role=null;
-let asked=0;
-let used=new Set();
-let state={pace:0,curiosity:0,orientation:0};
-const card=document.getElementById("card");
-
-function entry(){
-  card.innerHTML=`
-    <h1 class="center">Who are you right now?</h1>
-    <div class="options">
-      ${roles.map(r=>`<button class="option center">${r}</button>`).join("")}
-    </div>
-  `;
-  [...card.querySelectorAll("button")].forEach(btn=>{
-    btn.onclick=()=>{
-      role=btn.textContent;
-      next();
-    };
-  });
-}
-entry();
-
-function next(){
-  if(asked===12){final();return;}
-  card.classList.add("fade-out");
-  setTimeout(()=>{
-    card.classList.remove("fade-out");
-    card.classList.add("fade-in");
-    renderQuestion();
-  },300+Math.random()*400);
-}
-
-function renderQuestion(){
-  const pool=pools[role];
-  let q;
-  do{
-    q=pool[Math.floor(Math.random()*pool.length)];
-  }while(used.has(q));
-  used.add(q);
-  asked++;
-
-  card.innerHTML=`
-    <div class="question">${q}</div>
-    <div class="options">
-      <button class="option">Pause, organize, and decide a clear next step.</button>
-      <button class="option">Explore possibilities and see what unfolds.</button>
-      <button class="option">Choose a safer path that reduces risk.</button>
-      <button class="option">Consider how others might view the choice.</button>
-    </div>
-  `;
-  [...card.querySelectorAll("button")].forEach((btn,i)=>{
-    btn.onclick=()=>{
-      if(i===0){state.pace++;state.curiosity--;state.orientation--;}
-      if(i===1){state.curiosity++;state.pace--;}
-      if(i===2){state.pace--;state.orientation--;}
-      if(i===3){state.orientation++;}
-
-      adaptUI(i);
-      next();
-    };
-  });
-}
-
-function adaptUI(i){
-  if(i===0){
-    document.body.style.background=
-      "radial-gradient(1200px 800px at 40% 20%,#132a3a,#0b1020)";
-  }
-  if(i===1){
-    document.body.style.background=
-      "radial-gradient(1200px 800px at 60% 30%,#1b3b2f,#0b1020)";
-  }
-  if(i===2){
-    document.body.style.background=
-      "radial-gradient(1200px 800px at 30% 40%,#101828,#0b1020)";
-  }
-  if(i===3){
-    document.body.style.background=
-      "radial-gradient(1200px 800px at 70% 50%,#2a2f45,#0b1020)";
-  }
-}
-
-function final(){
-  card.classList.add("fade-out");
-  setTimeout(()=>{
-    card.innerHTML=`
-      <div class="center">
-        <div style="font-size:1.2rem;line-height:1.7;margin-bottom:24px;">
-          You didn’t answer questions.<br/>You revealed a direction.
+    <!-- 1. HERO SECTION -->
+    <header class="hero">
+        <div class="container">
+            <h1>Sonar Glasses</h1>
+            <p class="subtitle">A New Vision for the Blind</p>
+            <p class="purpose">Empowering the visually impaired with real-time obstacle detection and spatial awareness through acoustic imaging.</p>
         </div>
-        <button class="reflect-btn">Reflect with ChatGPT</button>
-      </div>
-    `;
-    card.classList.remove("fade-out");
-    card.querySelector("button").onclick=()=>{
-      const prompt=encodeURIComponent(
-        "Based on my responses to 12 branching questions, help me understand my current mindset, decision patterns, strengths, blind spots, and possible growth directions — gently, without labels or judgment."
-      );
-      window.location.href="https://chat.openai.com/?prompt="+prompt;
-    };
-  },800);
-}
-</script>
+    </header>
+
+    <!-- 2. WHAT IS SONAR GLASSES -->
+    <section id="about">
+        <div class="container">
+            <h2>What is Sonar Glasses?</h2>
+            <p>Sonar Glasses are an innovative wearable technology designed to assist individuals with visual impairments. By using advanced sensors to "see" the environment, the glasses translate spatial information into intuitive audio feedback, helping users navigate the world with greater ease and safety.</p>
+        </div>
+    </section>
+
+    <!-- 3. HOW IT WORKS -->
+    <section id="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <ul>
+                <li><strong>Sound waves emitted:</strong> The device sends out high-frequency ultrasonic pulses into the environment.</li>
+                <li><strong>Echo reflected:</strong> These waves bounce off nearby objects and return to the sensors.</li>
+                <li><strong>Distance calculated:</strong> An onboard processor measures the time-of-flight to determine the exact distance of obstacles.</li>
+                <li><strong>Audio feedback to user:</strong> The system generates varying audio tones or haptic pulses to inform the user about the object's proximity.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 4. WORKING DEMO -->
+    <section id="demo">
+        <div class="container">
+            <h2>Working Demo</h2>
+            <p>Concept Demonstration</p>
+            <div class="video-placeholder">
+                <p>[ Concept Video Placeholder ]</p>
+                <!-- <video controls width="100%"><source src="demo.mp4" type="video/mp4"></video> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. COMPONENTS USED -->
+    <section id="components">
+        <div class="container">
+            <h2>Components Used</h2>
+            <ul>
+                <li>Ultrasonic sensors (HC-SR04 or similar)</li>
+                <li>LiDAR (for high-precision mapping)</li>
+                <li>Audio processor (Microcontroller/DSP)</li>
+                <li>Rechargeable Lithium-ion Battery</li>
+                <li>Bone conduction feedback system</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 6. BENEFITS -->
+    <section id="benefits">
+        <div class="container">
+            <h2>Benefits</h2>
+            <ul>
+                <li><strong>Safe navigation:</strong> Detects head-level obstacles that traditional canes might miss.</li>
+                <li><strong>Independence:</strong> Reduces reliance on sighted guides for daily movement.</li>
+                <li><strong>Confidence:</strong> Provides a mental map of the surroundings, increasing user comfort.</li>
+                <li><strong>Real-time awareness:</strong> Instant feedback allows for fluid movement in dynamic environments.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 7. WHO CAN USE THIS -->
+    <section id="who-can-use">
+        <div class="container">
+            <h2>Who Can Use This</h2>
+            <ul>
+                <li>Blind individuals</li>
+                <li>Visually impaired users</li>
+                <li>Senior citizens with age-related vision loss</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 8. WHY THIS IS DIFFERENT -->
+    <section id="comparison">
+        <div class="container">
+            <h2>Why This Is Different</h2>
+            <p>Traditional aids like the <strong>white cane</strong> only detect ground-level obstacles, while <strong>guide dogs</strong> require significant maintenance and training. <strong>Sonar Glasses</strong> offer a hands-free, tech-driven solution that provides upper-body protection and environmental awareness without the physical limitations of a cane or the responsibility of a live animal.</p>
+        </div>
+    </section>
+
+    <!-- 9. FUTURE SCOPE -->
+    <section id="future">
+        <div class="container">
+            <h2>Future Scope</h2>
+            <ul>
+                <li><strong>AI integration:</strong> Object recognition (e.g., "Door ahead", "Chair nearby").</li>
+                <li><strong>Smaller design:</strong> Miniaturization into standard eyeglass frames.</li>
+                <li><strong>Affordable pricing:</strong> Mass production to make it accessible in developing regions.</li>
+                <li><strong>Wider accessibility:</strong> Integration with GPS for turn-by-turn navigation.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 10. FAQ SECTION -->
+    <section id="faq">
+        <div class="container">
+            <h2>FAQ</h2>
+            <div class="faq-item">
+                <div class="faq-question">Is it safe?</div>
+                <div class="faq-answer">Yes, it uses low-power ultrasonic waves similar to those used in parking sensors, which are completely harmless to humans and pets.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Does it work indoors?</div>
+                <div class="faq-answer">Absolutely. It is highly effective in confined spaces, helping users navigate corridors and avoid furniture.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Is it affordable?</div>
+                <div class="faq-answer">The current prototype is built with cost-effective components. Our goal is to keep the final product much cheaper than existing high-tech aids.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Can it replace a cane?</div>
+                <div class="faq-answer">While it provides significant advantages, we recommend using it as a complementary tool to the white cane for maximum safety.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">Is this available in the market?</div>
+                <div class="faq-answer">Currently, it is a student innovation project in the prototype stage. We are looking for partners to bring it to market.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. FOOTER -->
+    <footer>
+        <div class="container">
+            <!-- ChatGPT Interaction Section -->
+            <div class="scanner-container">
+                <h3>Ask our AI Assistant</h3>
+                <p>Have more questions? Scan our AI portal to chat with ChatGPT about this project.</p>
+                <button class="scanner-btn" onclick="openAIChat()">Chat with AI</button>
+                <p class="scanner-note">Clicking will copy the project details and open ChatGPT.</p>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <p class="footer-text">Scan • Learn • Understand</p>
+                <p class="team-name">Created by Team Brain Stormers</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion Logic
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // ChatGPT Redirection Logic
+        function openAIChat() {
+            const projectPrompt = `I am an audience member at a presentation for "Sonar Glasses – A New Vision for the Blind".
+Please act as an AI assistant for this project.
+Project Details:
+- Purpose: Assistive device for the visually impaired using sound-based detection.
+- How it works: Emits sound waves, reflects echoes, calculates distance, provides audio feedback.
+- Components: Ultrasonic sensors, LiDAR, Audio processor, Battery, Feedback system.
+- Benefits: Safe navigation, independence, confidence, real-time awareness.
+- Comparison: Better than just a cane (upper body protection) or guide dog (no maintenance).
+- Future Scope: AI object recognition, miniaturization, affordable pricing.
+
+I will now ask you questions about this project. Please answer based on these details.`;
+
+            // Copy to clipboard
+            const el = document.createElement('textarea');
+            el.value = projectPrompt;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            alert("Project details copied to clipboard! You can now paste them into ChatGPT to start your conversation.");
+
+            // Redirect to ChatGPT
+            window.open("https://chatgpt.com/", "_blank");
+        }
+    </script>
 </body>
 </html>
